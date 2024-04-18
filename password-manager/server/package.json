@@ -1,0 +1,23 @@
+{
+    "name": "password-manager-backend",
+    "version": "1.0.0",
+    "description": "Backend server for the Password Manager application",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "author": "Yiwen Wang, Wen Xie",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dotenv": "^8.6.0",
+        "express": "^4.19.2",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.13.22"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    }
+}
