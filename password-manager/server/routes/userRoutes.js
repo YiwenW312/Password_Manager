@@ -2,11 +2,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Password = require('../models/Password');
 
 const router = express.Router();
 
-// Register route
+// Register
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -18,7 +17,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login route
+// Login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -38,7 +37,5 @@ router.post('/logout', (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
-// CRUD for passwords
-router.post('/password', async (req, res) => {
-  try {
-    const { userId, url
+  
+  module.exports = router;
