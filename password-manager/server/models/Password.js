@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongooseEncryption = require('mongoose-encryption');
 
 const passwordSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -7,6 +8,9 @@ const passwordSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+
+const secret = process.env.SECRET;
+passwordSchema.plugin(mongooseEncryption, { secret: secret, encryptedFields: ['password'] });
 
 const Password = mongoose.model('Password', passwordSchema);
 

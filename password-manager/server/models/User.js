@@ -4,7 +4,7 @@ const mongooseEncryption = require('mongoose-encryption');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
 });
 
 userSchema.pre('save', async function (next) {
@@ -16,9 +16,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const secret = process.env.SECRET;
-userSchema.plugin(mongooseEncryption, { secret: secret, encryptedFields: ['password'] });
+
 
 const User = mongoose.model('User', userSchema);
+
+const secret = process.env.SECRET;
+userSchema.plugin(mongooseEncryption, { secret: secret, encryptedFields: ['password'] });
 
 module.exports = User;

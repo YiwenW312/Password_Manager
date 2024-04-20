@@ -16,7 +16,7 @@ router.post('/passwords', authenticateToken, async (req, res) => {
   const password = req.body.password || generateSecurePassword(length, useNumbers, useSymbols);
   
   try {
-    const { userId } = req.user; // Extracted from token after middleware authentication
+    const { userId } = req.user; 
     const { url, password } = req.body;
 
     // Validate that the user provided both URL and password

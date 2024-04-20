@@ -8,6 +8,7 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
   try {
+    console.log('Registering user...');
     const { username, password } = req.body;
     // Check for existing user
     const existingUser = await User.findOne({ username });
@@ -17,19 +18,19 @@ router.post('/register', async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create a new user instance and save it to the database
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
-
+  
     // Create a token
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log('JWT Secret:', process.env.SECRET);
+    const token = jwt.sign({ userId: newUser._id }, process.env.SECRET, { expiresIn: '1h' });
 
     // Respond with the new user and token
     res.status(201).json({
       user: {
         id: newUser._id,
-        username: newUser.username
+        username: newUser.username,
       },
       token
     });
@@ -56,7 +57,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Create a token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '1h' });
 
     // Respond with the user and token
     res.json({
