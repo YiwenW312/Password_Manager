@@ -10,6 +10,12 @@
 |:----:|:----:|:----:|:----:|
 |Apr 18, 2024|1.0|Initial Readme| Yiwen Wang|
 
+# Extra points
+1. add password encryption
+2. add easy Copy to Clipboard
+3. add visually Obscured Passwords
+4. add Password Search
+5. add Cryptographically Secure Passwords
 
 # Instructions
 

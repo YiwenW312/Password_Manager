@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../AuthContext'; // Assuming you have an Auth context
+import { useAuth } from '../AuthContext'; 
+import '../styles/PasswordManagerPage.css';
+
 
 function PasswordManagerPage() {
   const { isAuthenticated } = useAuth();
   const [passwords, setPasswords] = useState([]);
+  const [filteredPasswords, setFilteredPasswords] = useState([]); 
+  const [searchTerm, setSearchTerm] = useState(''); 
   const [newPassword, setNewPassword] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [editing, setEditing] = useState(false);
@@ -15,11 +19,21 @@ function PasswordManagerPage() {
     }
   }, [isAuthenticated]);
 
+  // Whenever passwords or searchTerm state updates, update the filteredPasswords state
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = passwords.filter(passwordEntry =>
+      passwordEntry.url.toLowerCase().includes(lowercasedFilter)
+    );
+    setFilteredPasswords(filteredData);
+  }, [passwords, searchTerm]);
+
   const handlePasswordCreation = async (e) => {
     e.preventDefault();
     const method = editing ? "PUT" : "POST";
-    const endpoint = editing ? `http://localhost:5000/api/passwords/${currentId}` : 'http://localhost:5000/api/passwords';
+    const endpoint = editing ? `http://localhost:3000/api/passwords/${currentId}` : 'http://localhost:3000/api/passwords';
 
+  
     try {
       const response = await fetch(endpoint, {
         method: method,
@@ -48,7 +62,7 @@ function PasswordManagerPage() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/passwords/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/passwords/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -71,23 +85,51 @@ function PasswordManagerPage() {
     setEditing(true);
     setNewUrl(passwordEntry.url);
     setNewPassword(passwordEntry.password);
-    setCurrentId(passwordEntry._id); // Assuming each password has a unique _id
+    setCurrentId(passwordEntry._id);
+  };
+
+  const fetchPasswords = async () => {
+    const token = localStorage.getItem('token'); // Retrieve the auth token from storage
+
+    try {
+      const response = await fetch('http://localhost:3000/api/passwords', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Error occurred while fetching the passwords');
+      }
+      setPasswords(data); // Update the passwords state with the fetched passwords
+    } catch (error) {
+      console.error('Error:', error);
+      alert(error.message);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
-    <div>
+    <div className="main-content">
       <h2>Password Manager</h2>
+      <input 
+        type="text" 
+        placeholder="Search passwords" 
+        value={searchTerm} 
+        onChange={handleSearchChange} 
+      />
       <form onSubmit={handlePasswordCreation}>
-        <input type="text" placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-        <input type="password" placeholder="Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-        <button type="submit">{editing ? 'Update Password' : 'Add Password'}</button>
-        {editing && <button onClick={() => { setEditing(false); setNewPassword(''); setNewUrl(''); }}>Cancel Edit</button>}
+        {/* ... inputs and buttons for password form */}
       </form>
 
       <ul>
-        {passwords.map((passwordEntry) => (
+        {filteredPasswords.map((passwordEntry) => (
           <li key={passwordEntry._id}>
             URL: {passwordEntry.url}, Password: {passwordEntry.password}
+            {/* Edit and Delete buttons */}
             <button onClick={() => handleEdit(passwordEntry)}>Edit</button>
             <button onClick={() => handleDelete(passwordEntry._id)}>Delete</button>
           </li>
@@ -98,5 +140,3 @@ function PasswordManagerPage() {
 }
 
 export default PasswordManagerPage;
-
-

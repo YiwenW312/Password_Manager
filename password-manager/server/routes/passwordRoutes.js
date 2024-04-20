@@ -2,21 +2,54 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Password = require('../models/Password');
+const { authenticateToken } = require('../authMiddleware');
+const User = require('../models/User');
+const generateSecurePassword = require('../utils/passwordGenerator');
 
 const router = express.Router();
 
 // Password CRUD operations
 // Create a new password
-router.post('/passwords', async (req, res) => {
-    const { userId, url, password } = req.body;
-    try {
-      const newPassword = new Password({ userId, url, password });
-      await newPassword.save();
-      res.status(201).json(newPassword);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+router.post('/passwords', authenticateToken, async (req, res) => {
+  const { url, useNumbers, useSymbols, length } = req.body;
+  // If no password is provided, generate one
+  const password = req.body.password || generateSecurePassword(length, useNumbers, useSymbols);
+  
+  try {
+    const { userId } = req.user; // Extracted from token after middleware authentication
+    const { url, password } = req.body;
+
+    // Validate that the user provided both URL and password
+    if (!url || !password) {
+      return res.status(400).json({ message: 'URL and password are required.' });
     }
-  });
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new password entry
+    const newPasswordEntry = new Password({
+      user: userId,
+      url,
+      password: hashedPassword
+    });
+
+    // Save the new password entry to the database
+    await newPasswordEntry.save();
+
+    // Respond with the created password entry, excluding the hashed password
+    res.status(201).json({
+      _id: newPasswordEntry._id,
+      user: newPasswordEntry.user,
+      url: newPasswordEntry.url,
+      createdAt: newPasswordEntry.createdAt
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
   
   // Update an existing password
   router.put('/passwords/:id', async (req, res) => {

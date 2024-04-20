@@ -1,0 +1,21 @@
+.login-page {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .login-page h2 {
+    margin-bottom: 20px;
+  }
+  
+  .login-page form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .login-page button {
+    margin-top: 10px;
+  }
+  

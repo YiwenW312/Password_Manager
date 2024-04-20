@@ -1,11 +1,10 @@
-// src/components/LoginPage.js
-
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext'; 
+import '../styles/LoginPage.css';
 
 function LoginPage() {
-  const history = useHistory();
+  const history = useNavigate();
   const auth = useAuth(); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +16,7 @@ function LoginPage() {
     
     // Call the login endpoint of your backend API
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +41,7 @@ function LoginPage() {
   };
 
   return (
-    <div>
+    <div className="main-content">
       <h2>Login</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleLogin}>

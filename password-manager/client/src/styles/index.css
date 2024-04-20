@@ -1,0 +1,90 @@
+body, h1, h2, h3, p, input, button {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ECF0F1; /* Light grey background */
+  color: #333; /* Dark grey text */
+  line-height: 1.6;
+  padding-top: 70px; /* Make space for fixed navbar */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid #BDC3C7;
+}
+
+button {
+  background-color: #3498DB; /* Blue */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #2980B9;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.error {
+  color: #E74C3C;
+  font-size: 0.875em;
+}
+
+.hidden {
+  display: none;
+}
+
+.main-content {
+  padding-top: 20px;
+  padding-bottom: 60px;
+  width: 90%; 
+  max-width: 800px; 
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
+
+@media only screen and (max-width: 768px) {
+  body, h1, h2, h3, p, input, button {
+    font-size: 14px; 
+  }
+
+  .container, .main-content {
+    padding: 10px; 
+  }
+
+  input[type="text"], input[type="password"], input[type="email"] {
+    width: calc(100% - 20px); 
+    margin: 10px 0;
+  }
+
+  button {
+    padding: 10px; 
+  }
+
+  .form-group {
+    margin-bottom: 10px; 
+  }
+}

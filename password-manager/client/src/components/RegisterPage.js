@@ -1,12 +1,11 @@
-// src/components/RegisterPage.js
-
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useAuth } from '../AuthContext'; // Import the Auth context
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import '../styles/RegisterPage.css';
 
 function RegisterPage() {
-  const history = useHistory();
-  const auth = useAuth(); // Use the custom hook for authentication logic
+  const history = useNavigate();
+  const auth = useAuth(); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,7 +13,7 @@ function RegisterPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError(''); // Clear any existing errors
+    setError(''); 
 
     // Basic validation
     if (password !== confirmPassword) {
@@ -24,7 +23,7 @@ function RegisterPage() {
 
     // Call the register endpoint of your backend API
     try {
-      const response = await fetch('http://localhost:8000/api/register', {
+      const response = await fetch('http://localhost:3000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,9 +36,6 @@ function RegisterPage() {
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong during registration');
       }
-
-      // Use the login function from your AuthProvider
-      // Assume that your backend automatically logs the user in upon registration
       auth.login(data.token);
 
       // Redirect to the login page or directly to password manager if auto-login is enabled
@@ -50,7 +46,7 @@ function RegisterPage() {
   };
 
   return (
-    <div>
+    <div className="main-content">
       <h2>Register</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleRegister}>

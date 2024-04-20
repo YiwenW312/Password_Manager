@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const mongooseEncryption = require('mongoose-encryption');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -14,6 +15,9 @@ userSchema.pre('save', async function (next) {
   }
   next();
 });
+
+const secret = process.env.SECRET_KEY;
+userSchema.plugin(mongooseEncryption, { secret: secret, encryptedFields: ['password'] });
 
 const User = mongoose.model('User', userSchema);
 
