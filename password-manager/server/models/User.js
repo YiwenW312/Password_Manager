@@ -16,7 +16,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const secret = process.env.SECRET_KEY;
+const secret = process.env.SECRET;
 userSchema.plugin(mongooseEncryption, { secret: secret, encryptedFields: ['password'] });
 
 const User = mongoose.model('User', userSchema);

@@ -6,6 +6,7 @@ const shareRequestRoutes = require('./routes/shareRequestRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
+console.log("Secret Key:", process.env.SECRET);
 
 const app = express();
 app.use(express.json()); 
@@ -22,11 +23,8 @@ app.use('/api/passwords', passwordRoutes);
 app.use('/api/share-requests', shareRequestRoutes);
 app.use('/api/users', userRoutes);
 
-const apiRoutes = require('./routes/passwordRoutes');
-app.use('/api', apiRoutes);
-
 const { authenticateToken } = require('./authMiddleware');
-app.get('/passwords', authenticateToken);
+app.get('/passwords', authenticateToken, passwordHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
