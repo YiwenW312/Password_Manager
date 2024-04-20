@@ -23,7 +23,7 @@ function RegisterPage() {
 
     // Call the register endpoint of your backend API
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch('http://localhost:3000/api/uers/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

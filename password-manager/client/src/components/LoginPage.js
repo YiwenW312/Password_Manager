@@ -16,7 +16,7 @@ function LoginPage() {
     
     // Call the login endpoint of your backend API
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch('http://localhost:3000/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
