@@ -1,12 +1,15 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+require('dotenv').config()
+console.log(process.env.SECRET);
+
+const express = require('express')
+const mongoose = require('mongoose')
+
 const passwordRoutes = require('./routes/passwordRoutes');
 const shareRequestRoutes = require('./routes/shareRequestRoutes');
 const userRoutes = require('./routes/userRoutes');
+const { authenticateToken } = require('./authMiddleware');
+const { generateSecurePasswor } = require('./passwordGenerator');
 
-dotenv.config();
-console.log("Secret Key:", process.env.SECRET);
 
 const app = express();
 app.use(express.json()); 
@@ -23,8 +26,8 @@ app.use('/api/passwords', passwordRoutes);
 app.use('/api/share-requests', shareRequestRoutes);
 app.use('/api/users', userRoutes);
 
-const { authenticateToken } = require('./authMiddleware');
-app.get('/passwords', authenticateToken, passwordHandler);
+
+app.get('/passwords', authenticateToken, generateSecurePasswor);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
