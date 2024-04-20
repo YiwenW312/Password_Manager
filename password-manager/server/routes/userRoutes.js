@@ -8,7 +8,6 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
   try {
-    console.log('Registering user...');
     const { username, password } = req.body;
     // Check for existing user
     const existingUser = await User.findOne({ username });
@@ -16,14 +15,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists.' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
     // Create a new user instance and save it to the database
-    const newUser = new User({ username, password: hashedPassword });
+    const newUser = new User({ username, password });
     await newUser.save();
   
     // Create a token
-    console.log('JWT Secret:', process.env.SECRET);
     const token = jwt.sign({ userId: newUser._id }, process.env.SECRET, { expiresIn: '1h' });
 
     // Respond with the new user and token
@@ -47,13 +43,13 @@ router.post('/login', async (req, res) => {
     // Check for existing user
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid username or password.' });
+      return res.status(401).json({ message: 'Invalid username.' });
     }
 
     // Compare the provided password with the hashed password in the database
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid username or password.' });
+      return res.status(401).json({ message: 'Invalid password.' });
     }
 
     // Create a token

@@ -7,7 +7,7 @@ const ShareRequest = require('../models/ShareRequest');
 
 const router = express.Router();
 
-router.post('/share-request', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
       const { fromUserId, toUsername, passwordId } = req.body;
       const toUser = await User.findOne({ username: toUsername });
@@ -28,7 +28,7 @@ router.post('/share-request', async (req, res) => {
   });
   
   // ACCEPT Share Request
-  router.post('/share-request/:id/accept', async (req, res) => {
+  router.post('/:id/accept', async (req, res) => {
     try {
       const shareRequestId = req.params.id;
       const shareRequest = await ShareRequest.findById(shareRequestId);
@@ -52,7 +52,7 @@ router.post('/share-request', async (req, res) => {
   });
   
   // REJECT Share Request
-  router.post('/share-request/:id/reject', async (req, res) => {
+  router.post('/:id/reject', async (req, res) => {
     try {
       const shareRequestId = req.params.id;
       const shareRequest = await ShareRequest.findById(shareRequestId);
