@@ -15,6 +15,10 @@ function PasswordManagerPage() {
   const [currentId, setCurrentId] = useState(null);
   const [showPasswordIds, setShowPasswordIds] = useState(new Set());
   
+  const [passwordLength, setPasswordLength] = useState(12); 
+  const [useLetters, setUseLetters] = useState(true); 
+  const [useNumbers, setUseNumbers] = useState(true); 
+  const [useSymbols, setUseSymbols] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -127,21 +131,28 @@ function PasswordManagerPage() {
   return (
     <div className="main-content">
       <h2>Password Manager</h2>
-      <input 
-        type="text" 
-        placeholder="Search passwords" 
-        value={searchTerm} 
-        onChange={handleSearchChange} 
+      <input
+        type="text"
+        placeholder="Search passwords"
+        value={searchTerm}
+        onChange={handleSearchChange}
       />
       <form onSubmit={handlePasswordCreation}>
-        {/* ... inputs and buttons for password form */}
+        <input type="text" placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
+        <input type="text" placeholder="Password (leave empty to generate)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+        {/* Password generation settings */}
+        <div>
+          <input type="number" placeholder="Length" value={passwordLength} onChange={(e) => setPasswordLength(e.target.value)} />
+          <label><input type="checkbox" checked={useLetters} onChange={() => setUseLetters(!useLetters)} /> Letters</label>
+          <label><input type="checkbox" checked={useNumbers} onChange={() => setUseNumbers(!useNumbers)} /> Numbers</label>
+          <label><input type="checkbox" checked={useSymbols} onChange={() => setUseSymbols(!useSymbols)} /> Symbols</label>
+        </div>
+        <button type="submit">{editing ? "Update Password" : "Add Password"}</button>
       </form>
-
       <ul>
         {filteredPasswords.map((passwordEntry) => (
           <li key={passwordEntry._id}>
-            URL: {passwordEntry.url}, Password: {passwordEntry.password}
-            {/* Edit and Delete buttons */}
+            URL: {passwordEntry.url}
             <button onClick={() => togglePasswordVisibility(passwordEntry._id)}>
               {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
             </button>
@@ -155,5 +166,4 @@ function PasswordManagerPage() {
     </div>
   );
 }
-
 export default PasswordManagerPage;
