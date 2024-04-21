@@ -7,7 +7,7 @@ import '../styles/index.css';
 import '../styles/LoginPage.css';
 
 function LoginPage() {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +42,7 @@ function LoginPage() {
       auth.login(data.token);
 
       // Redirect to the password manager page or another protected route
-      history.push('/password-manager');
+      navigate('/password-manager');
     } catch (error) {
       setError(error.message);
     }

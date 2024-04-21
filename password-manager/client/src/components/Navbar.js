@@ -5,12 +5,12 @@ import '../styles/Navbar.css';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    history.push('/');
+    navigate('/');
     setIsMenuOpen(false);
   };
 

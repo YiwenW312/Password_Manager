@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 function RegisterPage() {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -47,7 +47,7 @@ function RegisterPage() {
       auth.login(data.token);
 
       // Redirect to the login page or directly to password manager if auto-login is enabled
-      history.push('/login');
+      navigate('/login');
     } catch (error) {
       setError(error.message);
     }
