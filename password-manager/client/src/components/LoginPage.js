@@ -38,9 +38,6 @@ function LoginPage() {
         throw new Error(data.message || 'Something went wrong');
       }
 
-      // Use the login function from your AuthProvider
-      auth.login(data.token);
-
       // Redirect to the password manager page or another protected route
       navigate('/password-manager');
     } catch (error) {
