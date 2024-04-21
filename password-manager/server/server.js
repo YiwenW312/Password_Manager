@@ -28,12 +28,12 @@ app.use('/api/share-requests', authenticateToken, shareRequestRoutes);
 // Basic error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).json({ message: 'Something went wrong' });
 });
 
 // Handle 404 - Keep this as a last route
 app.use((req, res, next) => {
-  res.status(404).send("404: Page not found");
+  res.status(404).json({ message: 'Not found' });
 });
 
 // Start server

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import '../styles/index.css';
 import '../styles/LoginPage.css';
 
 function LoginPage() {
@@ -46,25 +49,30 @@ function LoginPage() {
   };
 
   return (
-    <div className="main-content">
-      <h2>Login</h2>
-      {error && <p className="error">{error}</p>}
+    <div className="login-page">
+      <h1>Login</h1>
       <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={togglePasswordVisibility}>
-          {showPassword ? 'Hide' : 'Show'}
-        </button>
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div className="input-group">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="button" onClick={togglePasswordVisibility} className="password-toggle" >
+            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+          </button>
+        </div>
         <button type="submit">Login</button>
+        {error && <div className="error-message">{error}</div>}
       </form>
     </div>
   );

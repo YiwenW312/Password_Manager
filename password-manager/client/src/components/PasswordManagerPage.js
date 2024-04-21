@@ -14,11 +14,7 @@ function PasswordManagerPage() {
   const [editing, setEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [showPasswordIds, setShowPasswordIds] = useState(new Set());
-  const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -35,6 +31,7 @@ function PasswordManagerPage() {
     }
     setShowPasswordIds(newSet);
   };
+  
   // Whenever passwords or searchTerm state updates, update the filteredPasswords state
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
