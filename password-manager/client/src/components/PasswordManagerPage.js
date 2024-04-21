@@ -35,7 +35,7 @@ function PasswordManagerPage() {
     }
     setShowPasswordIds(newSet);
   };
-  // Whenever passwords or searchTerm state updates, update the filteredPasswords state
+
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
     const filteredData = passwords.filter(passwordEntry =>
