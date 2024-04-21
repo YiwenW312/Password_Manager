@@ -6,7 +6,8 @@ const passwordSchema = new mongoose.Schema({
   url: { type: String, required: true },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 const secret = process.env.SECRET;
