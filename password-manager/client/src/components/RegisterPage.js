@@ -5,15 +5,20 @@ import '../styles/RegisterPage.css';
 
 function RegisterPage() {
   const history = useNavigate();
-  const auth = useAuth(); 
+  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError(''); 
+    setError('');
 
     // Basic validation
     if (password !== confirmPassword) {
@@ -57,11 +62,13 @@ function RegisterPage() {
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
-          type="password"
-          placeholder="Password"
+          type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <button onClick={togglePasswordVisibility}>
+          {showPassword ? 'Hide' : 'Show'}
+        </button>
         <input
           type="password"
           placeholder="Confirm Password"

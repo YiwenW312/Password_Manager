@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext'; 
 import '../styles/PasswordManagerPage.css';
+import CopyToClipboardButton from './CopyToClipboardButton'; 
 
 
 function PasswordManagerPage() {
@@ -12,6 +13,12 @@ function PasswordManagerPage() {
   const [newUrl, setNewUrl] = useState('');
   const [editing, setEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
+  const [showPasswordIds, setShowPasswordIds] = useState(new Set());
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -19,6 +26,15 @@ function PasswordManagerPage() {
     }
   }, [isAuthenticated]);
 
+  const togglePasswordVisibility = (id) => {
+    const newSet = new Set(showPasswordIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setShowPasswordIds(newSet);
+  };
   // Whenever passwords or searchTerm state updates, update the filteredPasswords state
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
@@ -130,6 +146,11 @@ function PasswordManagerPage() {
           <li key={passwordEntry._id}>
             URL: {passwordEntry.url}, Password: {passwordEntry.password}
             {/* Edit and Delete buttons */}
+            <button onClick={() => togglePasswordVisibility(passwordEntry._id)}>
+              {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
+            </button>
+            {showPasswordIds.has(passwordEntry._id) ? passwordEntry.password : '••••••••'}
+            <CopyToClipboardButton text={passwordEntry.password} />
             <button onClick={() => handleEdit(passwordEntry)}>Edit</button>
             <button onClick={() => handleDelete(passwordEntry._id)}>Delete</button>
           </li>

@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext'; 
+import { useAuth } from '../AuthContext';
 import '../styles/LoginPage.css';
 
 function LoginPage() {
   const history = useNavigate();
-  const auth = useAuth(); 
+  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(''); 
-    
+    setError('');
+
     // Call the login endpoint of your backend API
     try {
       const response = await fetch('http://localhost:3000/api/users/login', {
@@ -52,11 +57,13 @@ function LoginPage() {
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
-          type="password"
-          placeholder="Password"
+          type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <button onClick={togglePasswordVisibility}>
+          {showPassword ? 'Hide' : 'Show'}
+        </button>
         <button type="submit">Login</button>
       </form>
     </div>
