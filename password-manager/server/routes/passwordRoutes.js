@@ -17,10 +17,7 @@ const router = express.Router();
 router.post('/newPasswords', authenticateToken, async (req, res) => {
   const { url, useNumbers, useSymbols, length } = req.body;
   // If no password is provided, generate one
-  if (!req.body.password || req.body.password === "") {
-    const password = generateSecurePassword(length, useNumbers, useSymbols);
-    req.body.password = password;
-  }
+  const password = req.body.password || generateSecurePassword(length, useNumbers, useSymbols);
   try {
     const { userId } = req.user.userId;
     // Validate that the user provided both URL and password
@@ -30,7 +27,7 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
     if (!password) {
       return res.status(400).json({ message: 'Password is required.' });
     }
-    
+
     // encrypt the password
     const encryptedPassword = encrypt(password);
     // Create a new password entry
