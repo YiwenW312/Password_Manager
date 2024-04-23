@@ -18,6 +18,17 @@
 5. add Cryptographically Secure Passwords
 
 # Instructions
+- To Run this App:
+1. Frontend: 
+    - `cd password`
+    - `cd frontend`
+    - `npm install`
+    - `npm start`
+2. Backend:
+    - `cd password`
+    - `cd backend`
+    - `npm install express mongoose cors cookie-parser dotenv`
+    - `npm start`
 
 
 
