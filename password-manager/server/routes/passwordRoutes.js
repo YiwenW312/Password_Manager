@@ -24,8 +24,8 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
     if (!url) {
       return res.status(400).json({ message: 'URL is required.' });
     }
-    if (!password) {
-      return res.status(400).json({ message: 'Password is required.' });
+    if (!password || ) {
+      const password = generateSecurePassword(length, useNumbers, useSymbols);
     }
 
     // encrypt the password
