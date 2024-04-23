@@ -25,7 +25,7 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'URL is required.' });
     }
     // encrypt the password
-    const encryptedPassword = encrypt(password, key);
+    const encryptedPassword = encrypt(password);
     // Create a new password entry
     const newPasswordEntry = new Password({
       userId: userId,
@@ -76,23 +76,15 @@ router.delete('/:id', async (req, res) => {
 // READ: Fetch all passwords for a user
 router.get('/user/:userId', async (req, res) => {
   try {
-    console.log("Requested User ID:", req.params.userId); 
-    let passwords = await Password.find({ userId: req.params.userId })
+    const passwords = await Password.find({})
       .populate('userId', 'username')
       .exec();
-
-    if (!passwords.length) {
-      console.log("No passwords found for this user.");
-      res.json([]); 
-      return;
-    }
-
     console.log("Passwords fetched:", passwords);
 
     // Map through the fetched passwords and decrypt each password
     let decryptedPasswords = passwords.map(p => {
       try {
-        const decryptedPassword = decrypt(p.password, key);
+        const decryptedPassword = decrypt(p.password);
         return { ...p.toObject(), password: decryptedPassword };
       } catch (error) {
         console.error("Decryption error:", error);
