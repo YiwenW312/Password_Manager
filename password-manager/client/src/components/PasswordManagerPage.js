@@ -258,7 +258,7 @@ function PasswordManagerPage() {
         <input type="text" placeholder="Password (leave empty to generate)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
         <div>
           <label>
-            <input type="checkbox" checked={useLetters} onChange={() => setUseLetters(!useLetters)} /> Letters
+            <input type="checkbox" checked={true} disabled={true} /> Letters
           </label>
           <label>
             <input type="checkbox" checked={useNumbers} onChange={() => setUseNumbers(!useNumbers)} /> Numbers
