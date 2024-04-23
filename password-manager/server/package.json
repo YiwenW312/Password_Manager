@@ -21,6 +21,7 @@
     "mongoose-encryption": "^2.1.2"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/dotenv": "^8.2.0",
     "nodemon": "^2.0.4"
   },

@@ -177,7 +177,7 @@ function PasswordManagerPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated,currentUser]);
+  }, [isAuthenticated, currentUser]);
 
   // Function to handle show shared passwords
   const fetchSharedPasswords = useCallback(async () => {
@@ -221,20 +221,22 @@ function PasswordManagerPage() {
     }
   }, [isAuthenticated, currentUser, fetchSharedPasswords]);
 
-    // Filter the passwords based on the search term
-    useEffect(() => {
-      if (searchTerm) {
-        setFilteredPasswords(passwords.filter(p =>
-          p.url.toLowerCase().includes(searchTerm.toLowerCase())
-        ));
-      } else {
-        setFilteredPasswords(passwords);
-      }
-    }, [searchTerm, passwords]);
+  // Filter the passwords based on the search term
+  useEffect(() => {
+    if (searchTerm) {
+      setFilteredPasswords(passwords.filter(p =>
+        p.url.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
+    } else {
+      setFilteredPasswords(passwords);
+    }
+  }, [searchTerm, passwords]);
 
   return (
     <div className="main-content">
+
       <h2>Password Manager</h2>
+      
       {/* Search functionality */}
       <input
         type="text"
@@ -242,6 +244,8 @@ function PasswordManagerPage() {
         value={searchTerm}
         onChange={handleSearchChange}
       />
+      <button onClick={() => setFilteredPasswords(passwords)}>search</button>
+
 
       {/* Save password group */}
       <form onSubmit={handlePasswordCreation}>
@@ -265,7 +269,7 @@ function PasswordManagerPage() {
       {isLoading ? (
         <p>Loading passwords...</p>
       ) : passwords.length === 0 ? (
-        <p>No passwords found. Try adding some!</p>
+        <p>No passwords found.</p>
       ) : (
         <>
           {/* List of passwords */}
