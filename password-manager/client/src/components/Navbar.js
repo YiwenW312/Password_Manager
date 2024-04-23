@@ -28,7 +28,7 @@ function Navbar() {
         {isAuthenticated ? (
           <>
             <Link to="/password-manager" className="nav-item" onClick={() => setIsMenuOpen(false)}>
-              {currentUser && `${currentUser.username}'s Password Manager`}
+              { `${currentUser.username}'s Password Manager`}
             </Link>
             <Link className="nav-item" onClick={handleLogout}>Logout</Link>
           </>
