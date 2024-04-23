@@ -18,7 +18,7 @@ const LoginModal = ({ close }) => {
     e.preventDefault();
     try {
       await login(username, password);
-      close(); 
+      close();
     } catch (err) {
       console.error(err);
     }

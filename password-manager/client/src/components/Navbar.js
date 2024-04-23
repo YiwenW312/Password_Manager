@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import LoginModal from './LoginModal'; 
+import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import '../styles/Navbar.css';
 
@@ -28,7 +28,7 @@ function Navbar() {
         {isAuthenticated ? (
           <>
             <Link to="/password-manager" className="nav-item" onClick={() => setIsMenuOpen(false)}>
-              { `${currentUser.username}'s Password Manager`}
+              {`${currentUser.username}'s Password Manager`}
             </Link>
             <Link className="nav-item" onClick={handleLogout}>Logout</Link>
           </>

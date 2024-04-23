@@ -1,4 +1,10 @@
-body, h1, h2, h3, p, input, button {
+body,
+h1,
+h2,
+h3,
+p,
+input,
+button {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
@@ -6,10 +12,10 @@ body, h1, h2, h3, p, input, button {
 }
 
 body {
-  background-color: #ECF0F1; 
+  background-color: #ECF0F1;
   color: #333;
   line-height: 1.6;
-  padding-top: 70px; 
+  padding-top: 70px;
 }
 
 .container {
@@ -18,7 +24,8 @@ body {
   padding: 20px;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"],
+input[type="password"] {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -27,7 +34,7 @@ input[type="text"], input[type="password"] {
 }
 
 button {
-  background-color: #3498DB; 
+  background-color: #3498DB;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -57,34 +64,44 @@ button:hover {
 .main-content {
   padding-top: 20px;
   padding-bottom: 60px;
-  width: 90%; 
-  max-width: 800px; 
+  width: 90%;
+  max-width: 800px;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 }
 
 
 @media only screen and (max-width: 768px) {
-  body, h1, h2, h3, p, input, button {
-    font-size: 14px; 
+
+  body,
+  h1,
+  h2,
+  h3,
+  p,
+  input,
+  button {
+    font-size: 14px;
   }
 
-  .container, .main-content {
-    padding: 10px; 
+  .container,
+  .main-content {
+    padding: 10px;
   }
 
-  input[type="text"], input[type="password"], input[type="email"] {
-    width: calc(100% - 20px); 
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: calc(100% - 20px);
     margin: 10px 0;
   }
 
   button {
-    padding: 10px; 
+    padding: 10px;
   }
 
   .form-group {
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
   }
 }

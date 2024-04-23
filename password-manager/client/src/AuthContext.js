@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -10,6 +11,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,16 +30,16 @@ export function AuthProvider({ children }) {
         },
         body: JSON.stringify({ username, password }),
       });
-      
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Error occurred during login');
       }
-
       localStorage.setItem('token', data.token);
       setCurrentUser({ username, token: data.token });
       setIsAuthenticated(true);
       setError(null);
+      navigate('/password-manager');
     } catch (error) {
       console.error("Login failed:", error);
       setError(error.message);

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth} from '../AuthContext'; 
+import { useAuth } from '../AuthContext';
 import '../styles/RegisterModal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const RegisterModal = ({ close }) => {
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,12 +21,10 @@ const RegisterModal = ({ close }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
-
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
-
     try {
       const response = await fetch('http://localhost:3000/api/users/register', {
         method: 'POST',
@@ -35,15 +33,15 @@ const RegisterModal = ({ close }) => {
         },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong during registration');
       }
 
-      login(data.token);
+      await login(username, password);
+
       close();
+      
       navigate('/password-manager');
     } catch (error) {
       setError(error.message);

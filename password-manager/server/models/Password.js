@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const mongooseEncryption = require('mongoose-encryption');
-
+// This is the schema for the password model
 const passwordSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   url: { type: String, required: true },
