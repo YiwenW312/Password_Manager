@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +8,16 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      setCurrentUser({ token });
+    }
+  }, []);
 
   const login = async (username, password) => {
     try {
@@ -24,33 +34,27 @@ export function AuthProvider({ children }) {
         throw new Error(data.message || 'Error occurred during login');
       }
 
-      // Save the JWT token in local storage
       localStorage.setItem('token', data.token);
-
-      // Update state to reflect user login
-      setCurrentUser({
-        username,
-        token: data.token,
-      });
+      setCurrentUser({ username, token: data.token });
+      setIsAuthenticated(true);
+      setError(null);
     } catch (error) {
       console.error("Login failed:", error);
-      throw error; // Rethrow the error so it can be handled by the login form
+      setError(error.message);
+      setIsAuthenticated(false);
+      throw error;
     }
   };
 
   const logout = () => {
-    // Remove the token from local storage
     localStorage.removeItem('token');
-
-    // Update state to reflect user logout
     setCurrentUser(null);
+    setIsAuthenticated(false);
   };
 
-  // Provide state and authentication functions to the context
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, isAuthenticated, login, logout, error }}>
       {children}
     </AuthContext.Provider>
   );
 }
-

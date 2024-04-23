@@ -6,10 +6,10 @@ body, h1, h2, h3, p, input, button {
 }
 
 body {
-  background-color: #ECF0F1; /* Light grey background */
-  color: #333; /* Dark grey text */
+  background-color: #ECF0F1; 
+  color: #333;
   line-height: 1.6;
-  padding-top: 70px; /* Make space for fixed navbar */
+  padding-top: 70px; 
 }
 
 .container {
@@ -27,7 +27,7 @@ input[type="text"], input[type="password"] {
 }
 
 button {
-  background-color: #3498DB; /* Blue */
+  background-color: #3498DB; 
   color: white;
   padding: 10px 15px;
   border: none;

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import LoginModal from './LoginModal'; 
+import RegisterModal from './RegisterModal';
 import '../styles/Navbar.css';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -23,19 +27,22 @@ function Navbar() {
         <Link to="/" className="nav-item" onClick={() => setIsMenuOpen(false)}>Home</Link>
         {isAuthenticated ? (
           <>
-            <Link to="/password-manager" className="nav-item" onClick={() => setIsMenuOpen(false)}>Password Manager</Link>
-            <button onClick={handleLogout}>Logout</button>
+            <Link to="/password-manager" className="nav-item" onClick={() => setIsMenuOpen(false)}>
+              {currentUser && `${currentUser.username}'s Password Manager`}
+            </Link>
+            <Link className="nav-item" onClick={handleLogout}>Logout</Link>
           </>
         ) : (
           <>
-            <Link to="/login" className="nav-item" onClick={() => setIsMenuOpen(false)}>Login</Link>
-            <Link to="/register" className="nav-item" onClick={() => setIsMenuOpen(false)}>Register</Link>
+            <Link className="nav-item" onClick={() => setShowLoginModal(true)}>Login</Link>
+            <Link className="nav-item" onClick={() => setShowRegisterModal(true)}>Register</Link>
           </>
         )}
       </div>
+      {showLoginModal && <LoginModal close={() => setShowLoginModal(false)} />}
+      {showRegisterModal && <RegisterModal close={() => setShowRegisterModal(false)} />}
     </nav>
   );
 }
 
 export default Navbar;
-
