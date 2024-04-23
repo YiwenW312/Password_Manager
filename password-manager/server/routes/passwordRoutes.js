@@ -20,8 +20,6 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
   if (!req.body.password || req.body.password === "") {
     const password = generateSecurePassword(length, useNumbers, useSymbols);
     req.body.password = password;
-  }else{
-    const password = req.body.password;
   }
   try {
     const { userId } = req.user.userId;
