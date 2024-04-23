@@ -80,7 +80,7 @@ router.get('/user/:userId', async (req, res) => {
       .populate('userId', 'username')
       .exec();
     console.log("Passwords fetched:", passwords);
-    if (!sharedPasswords.length) {
+    if (!passwords.length) {
       return res.status(404).json({ message: "No passwords found for this user." });
     }
 
