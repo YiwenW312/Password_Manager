@@ -236,15 +236,20 @@ function PasswordManagerPage() {
     <div className="main-content">
 
       <h2>Password Manager</h2>
-      
+
       {/* Search functionality */}
       <input
         type="text"
         placeholder="Search passwords"
         value={searchTerm}
-        onChange={handleSearchChange}
+        onChange={(e) => handleSearchChange(e)}
       />
-      <button onClick={() => setFilteredPasswords(passwords)}>search</button>
+      <button onClick={() => {
+        const filtered = passwords.filter(p =>
+          p.url.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredPasswords(filtered);
+      }}>Search</button>
 
 
       {/* Save password group */}
@@ -276,18 +281,24 @@ function PasswordManagerPage() {
           <ul>
             {filteredPasswords.map((passwordEntry) => (
               <li key={passwordEntry._id}>
-                URL: {passwordEntry.url}x
-                <button onClick={() => togglePasswordVisibility(passwordEntry._id)}>
-                  {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
-                </button>
-                {showPasswordIds.has(passwordEntry._id) && <span>{passwordEntry.password}</span>}
-                <CopyToClipboardButton text={passwordEntry.password} />
-                <button onClick={() => handleEdit(passwordEntry)}>Edit</button>
-                <button onClick={() => handleDelete(passwordEntry._id)}>Delete</button>
-                <button onClick={() => handleShare(passwordEntry)}>Share</button>
+                <div>
+                  <strong>URL:</strong> {passwordEntry.url}
+                  <button onClick={() => togglePasswordVisibility(passwordEntry._id)}>
+                    {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
+                  </button>
+                  {showPasswordIds.has(passwordEntry._id) && <span>{passwordEntry.password}</span>}
+                  <CopyToClipboardButton text={passwordEntry.password} />
+                  <button onClick={() => handleEdit(passwordEntry)}>Edit</button>
+                  <button onClick={() => handleDelete(passwordEntry._id)}>Delete</button>
+                  <button onClick={() => handleShare(passwordEntry)}>Share</button>
+                </div>
+                <div>
+                  <strong>Last Updated:</strong> {new Date(passwordEntry.updatedAt).toLocaleDateString()} {new Date(passwordEntry.updatedAt).toLocaleTimeString()}
+                </div>
               </li>
             ))}
           </ul>
+
           {showEditModal && (
             <EditPasswordModal
               currentPassword={currentPassword}
@@ -295,6 +306,7 @@ function PasswordManagerPage() {
               onSave={handleSaveChanges}
             />
           )}
+
           {/* Share password modal or component */}
           {showShareModal && <SharePasswordModal close={() => setShowShareModal(false)} />}
 

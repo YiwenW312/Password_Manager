@@ -80,6 +80,9 @@ router.get('/user/:userId', async (req, res) => {
       .populate('userId', 'username')
       .exec();
     console.log("Passwords fetched:", passwords);
+    if (!sharedPasswords.length) {
+      return res.status(404).json({ message: "No passwords found for this user." });
+    }
 
     // Map through the fetched passwords and decrypt each password
     let decryptedPasswords = passwords.map(p => {

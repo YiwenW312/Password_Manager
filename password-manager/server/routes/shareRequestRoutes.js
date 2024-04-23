@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const Password = require('../models/Password');
 const User = require('../models/User');
 const ShareRequest = require('../models/ShareRequest');
+const { decrypt } = require('../utils/cryptoHelper');
 // Instantiate a Router
 const router = express.Router();
 
@@ -80,23 +81,39 @@ router.get('/passwords/shared/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     console.log("Requested shared passwords for user:", userId);
+
     // Fetch all passwords where the current user is in the sharedWith array
     const sharedPasswords = await Password.find({ sharedWith: userId })
       .populate('userId', 'username')
-      .populate('sharedWith', 'username'); // Populating shared users' usernames
-    console.log("Shared passwords found:", sharedPasswords);
-    console.log("Shared passwords count:", sharedPasswords.length);
-    console.log("Shared passwords owner:", sharedPasswords[0].userId?.username);
-    console.log("Shared passwords shared users details:", sharedPasswords[0].sharedWith);
+      .populate('sharedWith', 'username');
+
+    console.log("Populated shared passwords:", sharedPasswords);
+
+    // Check if any shared passwords were found
     if (!sharedPasswords.length) {
       return res.status(404).json({ message: "No shared passwords found for this user." });
     }
-    const response = sharedPasswords.map(password => ({
-      id: password._id,
-      url: password.url,
-      owner: password.userId?.username,
-      sharedUsers: password.sharedWith
-    }));
+
+    // Map through the passwords to decrypt and format the response
+    const response = sharedPasswords.map(password => {
+      // Additional logging to check the population
+      console.log(`Password ID: ${password._id}, Owner: ${password.username}`);
+
+      // Check if userId is populated before trying to access username
+      if (!password.userId) {
+        throw new Error('Password owner not found or not populated');
+      }
+
+      const decryptedPassword = decrypt(password.password);
+      return {
+        id: password._id,
+        url: password.url,
+        owner: password.username,
+        sharedUsers: password.sharedWith.map(user => user.username), 
+        password: decryptedPassword 
+      };
+    });
+
     console.log("Response to be sent:", response);
     res.json(response);
   } catch (error) {
@@ -104,5 +121,6 @@ router.get('/passwords/shared/:userId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = router;
