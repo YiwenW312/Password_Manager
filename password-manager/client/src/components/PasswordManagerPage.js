@@ -36,13 +36,6 @@ function PasswordManagerPage() {
   // State variable to store the loading status
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filter the passwords based on the search term
-  useEffect(() => {
-    setFilteredPasswords(passwords.filter(p =>
-      p.url.toLowerCase().includes(searchTerm.toLowerCase())
-    ));
-  }, [searchTerm, passwords]);
-
   // Function to generate a secure password or use the provided password
   const handlePasswordCreation = async (e) => {
     e.preventDefault();
@@ -110,7 +103,6 @@ function PasswordManagerPage() {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update password');
       }
-
       // Refresh the password list
       fetchPasswords();
     } catch (error) {
@@ -125,36 +117,6 @@ function PasswordManagerPage() {
     setCurrentPassword(passwordEntry);
     setShowEditModal(true);
   };
-
-  // Function to fetch the passwords from the server
-  const fetchPasswords = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!currentUser || !currentUser._id) {
-      console.error('Current user ID is not available.');
-      return;
-    }
-    setIsLoading(true);  // Start loading
-    try {
-      const endpoint = `http://localhost:3000/api/passwords/user/${currentUser._id}`;
-      console.log('Fetching from:', endpoint); 
-      const response = await fetch(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Error occurred while fetching the passwords');
-      }
-      setPasswords(data);
-    } catch (error) {
-      console.error('Error:', error);
-      alert(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentUser, isAuthenticated]);
-
 
   // Function to handle save changes
   const handleSaveChanges = async (updatedPassword) => {
@@ -181,11 +143,48 @@ function PasswordManagerPage() {
     });
   };
 
+  // Function to fetch the passwords from the server
+  const fetchPasswords = useCallback(async () => {
+    if (!isAuthenticated || !currentUser || !currentUser._id) {
+      console.error('Authentication data is not available or incomplete.');
+      setIsLoading(false);
+      return;
+    }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token available.');
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const endpoint = `http://localhost:3000/api/passwords/user/${currentUser._id}`;
+      console.log('Fetching from:', endpoint);
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setPasswords(data);
+    } catch (error) {
+      console.error('Error fetching passwords:', error);
+      alert(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated,currentUser]);
+
   // Function to handle show shared passwords
   const fetchSharedPasswords = useCallback(async () => {
-    const endpoint = 'http://localhost:3000/api/passwords/shared';
+    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${currentUser._id}`;
     try {
       const response = await fetch(endpoint, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${currentUser?.token}`
         },
@@ -199,7 +198,7 @@ function PasswordManagerPage() {
       console.error('Error:', error);
       alert(error.message);
     }
-  }, [currentUser.token]);
+  }, [currentUser._id, currentUser.token]);
 
 
   // Function to handle sharing a password (opens the SharePasswordModal component)
@@ -207,55 +206,68 @@ function PasswordManagerPage() {
     setShowShareModal(true);
   };
 
+
   // Fetch the passwords when the component mounts
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUser && currentUser._id) {
       fetchPasswords();
     }
-  }, [isAuthenticated, fetchPasswords]);
+  }, [isAuthenticated, currentUser, fetchPasswords]);
 
   // Function to handle the fetching of shared passwords
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUser && currentUser._id) {
       fetchSharedPasswords();
     }
-  }, [isAuthenticated, fetchSharedPasswords]);
+  }, [isAuthenticated, currentUser, fetchSharedPasswords]);
+
+    // Filter the passwords based on the search term
+    useEffect(() => {
+      if (searchTerm) {
+        setFilteredPasswords(passwords.filter(p =>
+          p.url.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
+      } else {
+        setFilteredPasswords(passwords);
+      }
+    }, [searchTerm, passwords]);
 
   return (
     <div className="main-content">
+      <h2>Password Manager</h2>
+      {/* Search functionality */}
+      <input
+        type="text"
+        placeholder="Search passwords"
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
+
+      {/* Save password group */}
+      <form onSubmit={handlePasswordCreation}>
+        <input type="text" placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} required />
+        <input type="text" placeholder="Password (leave empty to generate)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+        <div>
+          <label>
+            <input type="checkbox" checked={useLetters} onChange={() => setUseLetters(!useLetters)} /> Letters
+          </label>
+          <label>
+            <input type="checkbox" checked={useNumbers} onChange={() => setUseNumbers(!useNumbers)} /> Numbers
+          </label>
+          <label>
+            <input type="checkbox" checked={useSymbols} onChange={() => setUseSymbols(!useSymbols)} /> Symbols
+          </label>
+          <input type="number" placeholder="Length" value={passwordLength} onChange={(e) => setPasswordLength(parseInt(e.target.value, 10))} />
+        </div>
+        <button type="submit">{"Add Password"}</button>
+      </form>
+
       {isLoading ? (
         <p>Loading passwords...</p>
+      ) : passwords.length === 0 ? (
+        <p>No passwords found. Try adding some!</p>
       ) : (
         <>
-          <h2>Password Manager</h2>
-
-          {/* Search functionality */}
-          <input
-            type="text"
-            placeholder="Search passwords"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-
-          {/* Save password group */}
-          <form onSubmit={handlePasswordCreation}>
-            <input type="text" placeholder="URL" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} required />
-            <input type="text" placeholder="Password (leave empty to generate)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-            <div>
-              <label>
-                <input type="checkbox" checked={useLetters} onChange={() => setUseLetters(!useLetters)} /> Letters
-              </label>
-              <label>
-                <input type="checkbox" checked={useNumbers} onChange={() => setUseNumbers(!useNumbers)} /> Numbers
-              </label>
-              <label>
-                <input type="checkbox" checked={useSymbols} onChange={() => setUseSymbols(!useSymbols)} /> Symbols
-              </label>
-              <input type="number" placeholder="Length" value={passwordLength} onChange={(e) => setPasswordLength(parseInt(e.target.value, 10))} />
-            </div>
-            <button type="submit">{newPassword ? "Update Password" : "Add Password"}</button>
-          </form>
-
           {/* List of passwords */}
           <ul>
             {filteredPasswords.map((passwordEntry) => (
@@ -295,7 +307,7 @@ function PasswordManagerPage() {
           </ul>
         </>
       )}
-        </div>
+    </div>
   );
 }
 

@@ -7,6 +7,7 @@ const passwordRoutes = require('./routes/passwordRoutes');
 const shareRequestRoutes = require('./routes/shareRequestRoutes');
 const { authenticateToken } = require('./authMiddleware');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -19,6 +20,9 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log('MongoDB connected successfully.'))
 .catch(err => console.error('MongoDB connection error:', err));
+
+// Middleware
+app.use(cookieParser());
 
 // Use routes
 app.use('/api/users', userRoutes);
@@ -34,7 +38,7 @@ app.use((err, req, res, next) => {
 
 // Handle 404 - Keep this as a last route
 app.use((req, res, next) => {
-  res.status(404).json({ message: '404 Not found' });
+  res.status(404).json({ message: 'server: 404 Not found' });
 });
 
 // Start server
