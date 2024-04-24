@@ -4,6 +4,8 @@ import '../styles/PasswordManagerPage.css'
 import CopyToClipboardButton from './CopyToClipboardButton'
 import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
@@ -18,9 +20,7 @@ function PasswordManagerPage () {
   const [newPassword, setNewPassword] = useState('')
   const [newUrl, setNewUrl] = useState('')
   // State variables to store the editing status and the current password ID
-  const [editing, setEditing] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
-  const [currentId, setCurrentId] = useState(null)
   const [currentPassword, setCurrentPassword] = useState(null)
   const [showPasswordIds, setShowPasswordIds] = useState(new Set())
   // Password generation settings
@@ -33,9 +33,16 @@ function PasswordManagerPage () {
   const [showShareModal, setShowShareModal] = useState(false)
   // State variable to store the loading status
   const [isLoading, setIsLoading] = useState(true)
-  const crypto = require('crypto')
 
-  // Function to fetch the passwords from the server
+  /**
+   * All Fetch functions are defined here
+   * fetchPasswords: Fetches the passwords from the server
+   * fetchSharedPasswords: Fetches the shared passwords from the server
+   * userEffect: Fetches the passwords and shared passwords when the component mounts
+   * userEffect: Filters the passwords based on the search term
+   * handleSearchChange: Handles the change in the search term
+   */
+  // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
     if (!isAuthenticated || !currentUser || !currentUser._id) {
       console.error('Authentication data is not available or incomplete.')
@@ -112,14 +119,27 @@ function PasswordManagerPage () {
     setSearchTerm(e.target.value)
   }
 
+  /**
+   * All functions to handle password creation, deletion, editing, and sharing
+   * handlePasswordCreation: Generates a secure password or uses the provided password
+   * handleDelete: Deletes a password
+   * handleEdit: Handles the editing of a password
+   * handleSaveChanges: Handles saving the changes to a password
+   * submitEdit: Submits the edited password
+   *
+   */
   // Function to generate a secure password or use the provided password
   const handlePasswordCreation = async e => {
     e.preventDefault()
-    const method = editing ? 'PUT' : 'POST'
-    const endpoint = editing
-      ? `http://localhost:3000/api/passwords/${currentId}`
-      : 'http://localhost:3000/api/passwords/newPasswords'
-
+    const method = 'POST'
+    const endpoint = 'http://localhost:3000/api/passwords/newPasswords'
+    const bodyContent = {
+      url: newUrl,
+      password: newPassword,
+      useNumbers,
+      useSymbols,
+      length: passwordLength
+    }
 
     try {
       const response = await fetch(endpoint, {
@@ -128,37 +148,28 @@ function PasswordManagerPage () {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ url: newUrl, password: passwordToSend })
+        body: JSON.stringify(bodyContent)
       })
       const data = await response.json()
-      if (!response.ok)
+      if (!response.ok) {
         throw new Error(
           data.message || 'Error occurred while saving the password'
         )
-      fetchPasswords()
-      setEditing(false)
-      setNewPassword('')
+      }
+
+      // Resetting fields on successful creation or navigate to a different page or update the state
       setNewUrl('')
-      setCurrentId(null)
+      setNewPassword('')
+      setPasswordLength(12)
+      setUseNumbers(true)
+      setUseSymbols(false)
+
+      fetchPasswords()
     } catch (error) {
       console.error('Error:', error)
       alert(error.message)
     }
   }
-
-  // Function to generate a secure password
-  const generateSecurePassword = (length, hasNumbers, hasSymbols) => {
-    let charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (hasNumbers) charset += '0123456789';
-    if (hasSymbols) charset += '!@#$%^&*()_+-=[]{}|;:",.<>?';
-  
-    const randomValues = new Uint8Array(length);
-    window.crypto.getRandomValues(randomValues); 
-  
-    return Array.from(randomValues)
-      .map((byte) => charset[byte % charset.length])
-      .join('');
-  };
 
   // Function to handle the deletion of a password
   const handleDelete = async id => {
@@ -184,6 +195,18 @@ function PasswordManagerPage () {
     }
   }
 
+  // handle edit
+  const handleEdit = passwordEntry => {
+    setCurrentPassword(passwordEntry)
+    setShowEditModal(true)
+  }
+
+  // Function to handle save changes
+  const handleSaveChanges = async updatedPassword => {
+    setShowEditModal(false)
+    await submitEdit(updatedPassword)
+  }
+
   // Function to submit the edited password
   const submitEdit = async ({ _id, url, password }) => {
     const token = localStorage.getItem('token')
@@ -199,7 +222,6 @@ function PasswordManagerPage () {
           body: JSON.stringify({ url, password })
         }
       )
-
       const data = await response.json()
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update password')
@@ -212,16 +234,10 @@ function PasswordManagerPage () {
     }
   }
 
-  // handle edit
-  const handleEdit = passwordEntry => {
+  // Function to handle sharing a password (opens the SharePasswordModal component)
+  const handleShare = passwordEntry => {
     setCurrentPassword(passwordEntry)
-    setShowEditModal(true)
-  }
-
-  // Function to handle save changes
-  const handleSaveChanges = async updatedPassword => {
-    setShowEditModal(false)
-    await submitEdit(updatedPassword)
+    setShowShareModal(true)
   }
 
   // Function to toggle the visibility of a password
@@ -235,11 +251,6 @@ function PasswordManagerPage () {
       }
       return newShowPasswordIds
     })
-  }
-
-  // Function to handle sharing a password (opens the SharePasswordModal component)
-  const handleShare = passwordEntry => {
-    setShowShareModal(true)
   }
 
   return (
@@ -307,61 +318,77 @@ function PasswordManagerPage () {
         </div>
         <button type='submit'>Add Password</button>
       </form>
-      {/* List of passwords */}
-      <ul>
-        {filteredPasswords.map(passwordEntry => (
-          <li key={passwordEntry._id}>
-            <div>
-              <strong>URL:</strong> {passwordEntry.url}
-              <button
-                onClick={() => togglePasswordVisibility(passwordEntry._id)}
-              >
-                {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
-              </button>
-              {showPasswordIds.has(passwordEntry._id) && (
-                <span>{passwordEntry.password}</span>
-              )}
-              <CopyToClipboardButton text={passwordEntry.password} />
-              <button onClick={() => handleEdit(passwordEntry)}>Edit</button>
-              <button onClick={() => handleDelete(passwordEntry._id)}>
-                Delete
-              </button>
-              <button onClick={() => handleShare(passwordEntry)}>Share</button>
-            </div>
-            <div>
-              <strong>Last Updated:</strong>{' '}
-              {new Date(passwordEntry.updatedAt).toLocaleDateString()}{' '}
-              {new Date(passwordEntry.updatedAt).toLocaleTimeString()}
-            </div>
-          </li>
-        ))}
-      </ul>
 
-      {/* Edit password modal */}
-      {showEditModal && (
-        <EditPasswordModal
-          currentPassword={currentPassword}
-          onClose={() => setShowEditModal(false)}
-          onSave={handleSaveChanges}
-        />
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          {/* List of passwords */}
+          <ul>
+            {filteredPasswords.map(passwordEntry => (
+              <li key={passwordEntry._id}>
+                <div>
+                  <strong>URL:</strong> {passwordEntry.url}
+                  <button
+                    onClick={() => togglePasswordVisibility(passwordEntry._id)}
+                    className='password-toggle'
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        showPasswordIds.has(passwordEntry._id)
+                          ? faEyeSlash
+                          : faEye
+                      }
+                    />
+                  </button>
+                  {showPasswordIds.has(passwordEntry._id) && (
+                    <span>{passwordEntry.password}</span>
+                  )}
+                  <CopyToClipboardButton text={passwordEntry.password} />
+                  <button onClick={() => handleEdit(passwordEntry)}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(passwordEntry._id)}>
+                    Delete
+                  </button>
+                  <button onClick={() => handleShare(passwordEntry)}>
+                    Share
+                  </button>
+                </div>
+                <div>
+                  <strong>Last Updated:</strong>{' '}
+                  {new Date(passwordEntry.updatedAt).toLocaleDateString()}{' '}
+                  {new Date(passwordEntry.updatedAt).toLocaleTimeString()}
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Edit password modal */}
+          {showEditModal && (
+            <EditPasswordModal
+              currentPassword={currentPassword}
+              onClose={() => setShowEditModal(false)}
+              onSave={handleSaveChanges}
+            />
+          )}
+          {/*show shared passwords */}
+          <h3>Shared Passwords:</h3>
+          <ul>
+            {sharedPasswords.map(sharedPasswordEntry => (
+              <li key={sharedPasswordEntry._id}>
+                URL: {sharedPasswordEntry.url}
+                Password: {sharedPasswordEntry.password}
+                Shared by: {sharedPasswordEntry.sharedBy}
+              </li>
+            ))}
+          </ul>
+        </>
       )}
-
       {/* Share password modal or component */}
       {showShareModal && (
         <SharePasswordModal close={() => setShowShareModal(false)} />
       )}
-
-      {/*show shared passwords */}
-      <h3>Shared Passwords:</h3>
-      <ul>
-        {sharedPasswords.map(sharedPasswordEntry => (
-          <li key={sharedPasswordEntry._id}>
-            URL: {sharedPasswordEntry.url}
-            Password: {sharedPasswordEntry.password}
-            Shared by: {sharedPasswordEntry.sharedBy}
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }

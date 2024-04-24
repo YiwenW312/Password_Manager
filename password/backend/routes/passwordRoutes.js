@@ -52,17 +52,23 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
 })
 
 // UPDATE an existing password entry
-router.put('/:id', async (req, res) => {
-  const { password } = req.body
+router.put('/:id', authenticateToken, async (req, res) => {
+  const { url, password } = req.body
+  const updateData = {}
+  if (password) updateData.password = encrypt(password)
+  if (url) updateData.url = url
+
   try {
     const updatedPassword = await Password.findByIdAndUpdate(
       req.params.id,
-      { password },
+      updateData,
       { new: true }
     )
     if (!updatedPassword) {
       return res.status(404).json({ message: 'Password not found' })
     }
+    // Optionally, decrypt the password before sending it back if necessary
+    // updatedPassword.password = decrypt(updatedPassword.password);
     res.json(updatedPassword)
   } catch (error) {
     res.status(500).json({ error: error.message })
