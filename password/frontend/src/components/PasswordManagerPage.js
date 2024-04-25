@@ -6,8 +6,7 @@ import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { jwtDecode } from 'jwt-decode';
-
+import { jwtDecode } from 'jwt-decode'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
@@ -37,17 +36,6 @@ function PasswordManagerPage () {
   // State variable to store the loading status
   const [isLoading, setIsLoading] = useState(true)
 
-  // Decode JWT to get user details
-  useEffect(() => {
-    if (isAuthenticated && currentUser) {
-      const decoded = jwtDecode(currentUser.token)
-      console.log('Decoded JWT:', decoded)
-      if (decoded && decoded.userId) {
-        fetchPasswords(decoded.userId)
-      }
-    }
-  }, [isAuthenticated, currentUser])
-
   /**
    * All Fetch functions are defined here
    * fetchPasswords: Fetches the passwords from the server
@@ -58,18 +46,15 @@ function PasswordManagerPage () {
    */
   // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
-    if (!currentUser || !currentUser._id) {
-      console.error('User ID is undefined.')
-      setIsLoading(false)
-      return
-    }
     const token = localStorage.getItem('token')
-    const endpoint = `http://localhost:3000/api/passwords/user/${currentUser._id}`
-    console.log('Fetching from:', endpoint)
+    const decoded = jwtDecode(token)
+    console.log('decoded:', decoded)
+    const userId = decoded.userId
+    console.log('userId:', userId)
 
     setIsLoading(true)
     try {
-      const endpoint = `http://localhost:3000/api/passwords/user/${currentUser._id}`
+      const endpoint = `http://localhost:3000/api/passwords/user/${userId}`
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
@@ -85,11 +70,15 @@ function PasswordManagerPage () {
     } finally {
       setIsLoading(false)
     }
-  }, [isAuthenticated, currentUser])
+  }, [currentUser])
 
   // Function to handle show shared passwords
   const fetchSharedPasswords = useCallback(async () => {
-    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${currentUser._id}`
+    const token = localStorage.getItem('token')
+    const decoded = jwtDecode(token)
+    const userId = decoded.userId
+
+    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${userId}`
     try {
       const response = await fetch(endpoint, {
         method: 'GET',
@@ -108,25 +97,13 @@ function PasswordManagerPage () {
       console.error('Error:', error)
       alert(error.message)
     }
-  }, [currentUser._id, currentUser.token])
-
-  // Debugging purpose: Log the current user details and authentication status
-  useEffect(() => {
-    console.log('Current User:', currentUser)
-    if (isAuthenticated && currentUser && currentUser._id) {
-      fetchPasswords()
-    } else {
-      console.log('Waiting for user data...')
-    }
-  }, [isAuthenticated, currentUser])
+  }, [currentUser.token])
 
   // Fetch the passwords when the component mounts
   useEffect(() => {
-    if (isAuthenticated && currentUser && currentUser._id) {
-      fetchPasswords()
-      fetchSharedPasswords()
-    }
-  }, [isAuthenticated, currentUser, fetchPasswords, fetchSharedPasswords])
+    fetchPasswords()
+    fetchSharedPasswords()
+  }, [fetchPasswords, fetchSharedPasswords])
 
   // Filter the passwords based on the search term
   useEffect(() => {
@@ -408,7 +385,7 @@ function PasswordManagerPage () {
             />
           )}
           {/*show shared passwords */}
-          <h3>Shared Passwords:</h3>
+          <h3>Passwords Shared by Others:</h3>
           <ul>
             {sharedPasswords.map(sharedPasswordEntry => (
               <li key={sharedPasswordEntry._id}>

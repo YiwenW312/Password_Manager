@@ -80,28 +80,21 @@ router.post('/:id/reject', async (req, res) => {
 router.get('/passwords/shared/:userId', async (req, res) => {
   try {
     const { userId } = req.params
-    console.log('Requested shared passwords for user:', userId)
 
     // Fetch all passwords where the current user is in the sharedWith array
     const sharedPasswords = await Password.find({ sharedWith: userId })
       .populate('userId', 'username')
       .populate('sharedWith', 'username')
 
-    console.log('Populated shared passwords:', sharedPasswords)
-
     // Check if any shared passwords were found
     if (!sharedPasswords.length) {
       return res
         .status(404)
-        .json({ message: 'No shared passwords found for this user.' })
+        .json({ message: 'No password shared by others for this user.' })
     }
 
     // Map through the passwords to decrypt and format the response
     const response = sharedPasswords.map(password => {
-      // Additional logging to check the population
-      console.log(`Password ID: ${password._id}, Owner: ${password.username}`)
-
-      // Check if userId is populated before trying to access username
       if (!password.userId) {
         throw new Error('Password owner not found or not populated')
       }
@@ -115,8 +108,6 @@ router.get('/passwords/shared/:userId', async (req, res) => {
         password: decryptedPassword
       }
     })
-
-    console.log('Response to be sent:', response)
     res.json(response)
   } catch (error) {
     console.error('Fetch Shared Passwords Error:', error)
