@@ -182,6 +182,12 @@ For this assignment, when you generate a password, we recommend you just use Mat
 # Writeup
 With your submission, you must include a writeup that touches on the following points.  You may discuss any other ideas that you deem salient to this work:
 
+- extra crdiets: 
+    -  Cryptographically Secure Passwords - Update your password generation to be more cryptographically secure and include in your writeup what makes this approach safer than just using Math.random: 
+    - Answer: Using Math.random() for generating passwords isn't very secure because it can be predictable, making it easier for hackers to guess the passwords. Instead, we use crypto.randomInt() from Node.js, which is designed to be much safer. It pulls unpredictable data from secure system sources, making the passwords it generates really hard to predict. This switch makes our password creation process more like a high-security lock, keeping users' data safer.
+
+This approach ensures that passwords generated in your application are more secure, catering to the security demands of modern web applications.
+
 - What were some challenges you faced while making this app?
 - Given more time, what additional features, functional or design changes would you make
 - What assumptions did you make while working on this assignment?

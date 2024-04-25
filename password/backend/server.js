@@ -10,6 +10,7 @@ const { authenticateToken } = require('./authMiddleware');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 
+
 const app = express();
 
 app.use(cors());

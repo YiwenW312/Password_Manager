@@ -15,34 +15,60 @@ const router = express.Router()
 
 // CREATE a new password
 router.post('/newPasswords', authenticateToken, async (req, res) => {
-  const { url, useNumbers, useSymbols, length } = req.body
-  // If no password is provided, generate one
-  const password =
-    req.body.password || generateSecurePassword(length, useNumbers, useSymbols)
-  try {
-    const { userId } = req.user.userId
-    // Validate that the user provided both URL and password
-    if (!url) {
-      return res.status(400).json({ message: 'URL is required.' })
-    }
-    if (!password) {
-      return res.status(400).json({ message: 'Password is required.' })
-    }
+  const {
+    url,
+    useLetters,
+    useNumbers,
+    useSymbols,
+    length,
+    password: clientPassword
+  } = req.body
 
-    // encrypt the password
+  if (!url) {
+    return res.status(400).json({ message: 'URL is required.' })
+  }
+
+  if (
+    length < 4 ||
+    length > 50 ||
+    (!useLetters && !useNumbers && !useSymbols)
+  ) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid password generation parameters.' })
+  }
+
+  let password = clientPassword
+
+  if (!password) {
+    // Generate password only if it's not provided
+    password = generateSecurePassword(
+      length,
+      useLetters,
+      useNumbers,
+      useSymbols
+    )
+  }
+
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required.' })
+  }
+
+  try {
+    const { userId } = req.user
     const encryptedPassword = encrypt(password)
-    // Create a new password entry
+
     const newPasswordEntry = new Password({
-      userId: userId,
+      userId,
       url,
       password: encryptedPassword
     })
-    // Save the new password entry to the database
+
     await newPasswordEntry.save()
-    // Respond with the created password entry, excluding the hashed password
+
     res.status(201).json({
       _id: newPasswordEntry._id,
-      user: newPasswordEntry.user,
+      user: newPasswordEntry.userId,
       url: newPasswordEntry.url,
       createdAt: newPasswordEntry.createdAt
     })

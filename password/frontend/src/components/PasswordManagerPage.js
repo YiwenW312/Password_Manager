@@ -25,6 +25,7 @@ function PasswordManagerPage () {
   const [showPasswordIds, setShowPasswordIds] = useState(new Set())
   // Password generation settings
   const [passwordLength, setPasswordLength] = useState(12)
+  const [useLetters, setUseLetters] = useState(true);
   const [useNumbers, setUseNumbers] = useState(true)
   const [useSymbols, setUseSymbols] = useState(false)
   // State variable to store the shared passwords
@@ -274,6 +275,7 @@ function PasswordManagerPage () {
       >
         Search
       </button>
+
       {/* Add password */}
       <form onSubmit={handlePasswordCreation}>
         <input
@@ -291,7 +293,12 @@ function PasswordManagerPage () {
         />
         <div>
           <label>
-            <input type='checkbox' checked disabled /> Letters
+            <input
+              type='checkbox'
+              checked={useLetters}
+              onChange={() => setUseLetters(!useLetters)}
+            />{' '}
+            Letters
           </label>
           <label>
             <input
@@ -313,12 +320,14 @@ function PasswordManagerPage () {
             type='number'
             placeholder='Length'
             value={passwordLength}
+            min={4}
+            max={50}
             onChange={e => setPasswordLength(parseInt(e.target.value, 10))}
           />
         </div>
         <button type='submit'>Add Password</button>
       </form>
-
+      
       {isLoading ? (
         <p>Loading...</p>
       ) : (
