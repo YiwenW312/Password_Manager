@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/SharePasswordModal.css';
 
-const SharePasswordModal = ({ close, passwordId }) => {
+const SharePasswordModal = ({ close, passwordEntry, fromUser }) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -10,20 +10,33 @@ const SharePasswordModal = ({ close, passwordId }) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('No authentication token found. Please login again.');
+      setIsSubmitting(false);
+      return;
+    }
     try {
-      const response = await fetch('/api/share-requests', {
+      const passwordId = passwordEntry.id;
+      console.log('passwordId:', passwordId);
+      const fromUserId = fromUser._id;
+      console.log('fromUserId:', fromUserId);
+      const response = await fetch('/api/share-requests/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
+          fromUserId: fromUserId,
           toUsername: username,
-          passwordId
+          passwordId: passwordId
         })
       });
+      console.log('Sending share request:', { fromUserId, username, passwordId });
 
+
+      console.log('response:', response);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Unable to share password.');

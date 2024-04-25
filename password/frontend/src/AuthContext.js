@@ -32,10 +32,13 @@ export function AuthProvider ({ children }) {
       })
 
       const data = await response.json()
+      console.log('data:', data)
       if (!response.ok) {
         throw new Error(data.message || 'Error occurred during login')
       }
       localStorage.setItem('token', data.token)
+      localStorage.setItem('userId', data.id)
+      
       setCurrentUser({ username, token: data.token, userId: data.id})
       setIsAuthenticated(true)
       setError(null)

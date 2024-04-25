@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
       status: 'pending'
     })
     await newShareRequest.save()
-    res.status(201).json(newShareRequest)
+    res.status(200).json(newShareRequest)
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -40,7 +40,15 @@ router.post('/:id/accept', async (req, res) => {
     if (!shareRequest) {
       return res.status(404).json({ message: 'Share request not found.' })
     }
-    // Update share request status
+
+    
+    if (shareRequest.status === 'accepted') {
+      return res.status(400).json({ message: 'Share request already accepted.' })
+    }
+    if (shareRequest.status === 'rejected') {
+      return res.status(400).json({ message: 'Share request already rejected.' })
+    }
+
     shareRequest.status = 'accepted'
     await shareRequest.save()
     const updatedPassword = await Password.findByIdAndUpdate(
@@ -67,7 +75,14 @@ router.post('/:id/reject', async (req, res) => {
     if (!shareRequest) {
       return res.status(404).json({ message: 'Share request not found.' })
     }
-    // Update share request status to rejected
+
+    if (shareRequest.status === 'accepted') {
+      return res.status(400).json({ message: 'Share request already accepted.' })
+    }
+    if (shareRequest.status === 'rejected') {
+      return res.status(400).json({ message: 'Share request already rejected.' })
+    }
+
     shareRequest.status = 'rejected'
     await shareRequest.save()
     res.json({ message: 'Share request rejected.' })
@@ -76,43 +91,50 @@ router.post('/:id/reject', async (req, res) => {
   }
 })
 
-// READ: fetch all share requests for a user
+// READ: fetch all share requests for a user(receiver) by status
 router.get('/passwords/shared/:userId', async (req, res) => {
   try {
-    const { userId } = req.params
+    const { userId } = req.params;
+    const { status } = req.query; 
 
-    // Fetch all passwords where the current user is in the sharedWith array
-    const sharedPasswords = await Password.find({ sharedWith: userId })
-      .populate('userId', 'username')
-      .populate('sharedWith', 'username')
+    const query = {
+      to: userId,
+      status: status,  
+    };
 
-    // Check if any shared passwords were found
-    if (!sharedPasswords.length) {
-      return res
-        .status(404)
-        .json({ message: 'No password shared by others for this user.' })
+    const shareRequests = await ShareRequest.find(query)
+      .populate({
+        path: 'passwordId',
+        populate: {
+          path: 'userId',
+          select: 'username'
+        }
+      })
+      .populate('from', 'username') 
+      .exec();
+
+    if (!shareRequests.length) {
+      return res.status(404).json({ message: `No ${status} share requests found for this user.` });
     }
 
-    // Map through the passwords to decrypt and format the response
-    const response = sharedPasswords.map(password => {
-      if (!password.userId) {
-        throw new Error('Password owner not found or not populated')
-      }
-
-      const decryptedPassword = decrypt(password.password)
+    const response = shareRequests.map(request => {
+      const decryptedPassword = decrypt(request.passwordId.password); 
       return {
-        id: password._id,
-        url: password.url,
-        owner: password.username,
-        sharedUsers: password.sharedWith.map(user => user.username),
-        password: decryptedPassword
-      }
-    })
-    res.json(response)
+        id: request._id,
+        url: request.passwordId.url,
+        owner: request.passwordId.userId.username,
+        from: request.from.username,
+        password: decryptedPassword,
+        status: request.status
+      };
+    });
+
+    res.json(response);
   } catch (error) {
-    console.error('Fetch Shared Passwords Error:', error)
-    res.status(500).json({ error: error.message })
+    console.error('Fetch Share Requests Error:', error);
+    res.status(500).json({ error: error.message });
   }
-})
+});
+
 
 module.exports = router

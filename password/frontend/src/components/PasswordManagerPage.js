@@ -28,12 +28,13 @@ function PasswordManagerPage () {
   const [useLetters, setUseLetters] = useState(true)
   const [useNumbers, setUseNumbers] = useState(true)
   const [useSymbols, setUseSymbols] = useState(false)
-  // State variable to store the shared passwords
-  const [sharedPasswords, setSharedPasswords] = useState([])
   // State variable to control the visibility of the SharePasswordModal component
   const [showShareModal, setShowShareModal] = useState(false)
   // State variable to store the loading status
   const [isLoading, setIsLoading] = useState(true)
+  // share requests
+const [pendingShareRequests, setPendingShareRequests] = useState([]);
+const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   /**
    * All Fetch functions are defined here
@@ -67,35 +68,10 @@ function PasswordManagerPage () {
     }
   }, [currentUser])
 
-  // Function to handle show shared passwords
-  const fetchSharedPasswords = useCallback(async () => {
-    const token = localStorage.getItem('token')
-    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${currentUser.userId}`
-    try {
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(
-          data.message || 'Error occurred while fetching shared passwords'
-        )
-      }
-      setSharedPasswords(data)
-    } catch (error) {
-      console.error('Error:', error)
-      alert(error.message)
-    }
-  }, [currentUser.userId])
-
   // Fetch the passwords when the component mounts
   useEffect(() => {
     fetchPasswords()
-    fetchSharedPasswords()
-  }, [fetchPasswords, fetchSharedPasswords])
+  }, [fetchPasswords])
 
   // Filter the passwords based on the search term
   useEffect(() => {
@@ -180,9 +156,9 @@ function PasswordManagerPage () {
         }
       )
       const data = await response.json()
-      // if (response.json !== "Password deleted") {
-      //   throw new Error(data.message || 'Failed to delete the password')
-      // }
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete the password')
+      }
       alert('Password deleted successfully')
       fetchPasswords()
     } catch (error) {
@@ -227,7 +203,7 @@ function PasswordManagerPage () {
       setPasswords(prevPasswords => {
         return prevPasswords.map(p => {
           if (p._id === _id) {
-            return { ...p, url, password } 
+            return { ...p, url, password }
           }
           return p
         })
@@ -256,6 +232,80 @@ function PasswordManagerPage () {
       }
       return newShowPasswordIds
     })
+  }
+
+  const fetchPendingShareRequests = async () => {
+    const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=pending`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setPendingShareRequests(data); 
+    } else {
+      console.error(data.message || 'Failed to fetch pending share requests');
+    }
+  };
+
+  const fetchAcceptedShareRequests = async () => {
+    const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=accepted`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setAcceptedShareRequests(data);  
+    } else {
+      console.error(data.message || 'Failed to fetch accepted share requests');
+    }
+  };
+  
+  useEffect(() => {
+    fetchAcceptedShareRequests();
+    fetchPendingShareRequests();
+  }, [currentUser.userId]);
+
+  const acceptShareRequest = async id => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/share-requests/${id}/accept`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to accept share request')
+      }
+      alert('Share request accepted')
+      fetchAcceptedShareRequests()
+    } catch (error) {
+      console.error('Error accepting share request:', error)
+    }
+  }
+
+  // Reject share request
+  const rejectShareRequest = async id => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/share-requests/${id}/reject`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reject share request')
+      }
+      alert('Share request rejected')
+      fetchPendingShareRequests()
+    } catch (error) {
+      console.error('Error rejecting share request:', error)
+    }
   }
 
   return (
@@ -390,23 +440,47 @@ function PasswordManagerPage () {
             />
           )}
 
+          {/* Share password modal or component */}
+          {showShareModal && (
+            <SharePasswordModal close={() => setShowShareModal(false)}
+            passwordEntry={currentPassword}
+            fromUser={currentUser}
+            />
+          )}
+
           {/*show shared passwords */}
           <h3>Passwords Shared by Others:</h3>
           <ul>
-            {sharedPasswords.map(sharedPasswordEntry => (
-              <li key={sharedPasswordEntry._id}>
-                URL: {sharedPasswordEntry.url}
-                Password: {sharedPasswordEntry.password}
-                Shared by: {sharedPasswordEntry.sharedBy}
+            {acceptedShareRequests.map(request => (
+              <li key={request.id}>
+                URL: {request.url}
+                Password: {request.password}
+                Shared by: {request.sharedBy}
               </li>
             ))}
           </ul>
         </>
       )}
-      {/* Share password modal or component */}
-      {showShareModal && (
-        <SharePasswordModal close={() => setShowShareModal(false)} />
-      )}
+
+      {/*show shared passwords requests*/}
+        <div>
+          <h3>Pending Share Requests:</h3>
+          <ul>
+            {pendingShareRequests.map(request => (
+              <li key={request.id}>
+                <p>
+                  URL: {request.url} - Shared by: {request.owner}
+                </p>
+                <button onClick={() => acceptShareRequest(request.id)}>
+                  Accept
+                </button>
+                <button onClick={() => rejectShareRequest(request.id)}>
+                  Reject
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
     </div>
   )
 }
