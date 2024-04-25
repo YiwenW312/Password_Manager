@@ -36,10 +36,13 @@ export function AuthProvider ({ children }) {
         throw new Error(data.message || 'Error occurred during login')
       }
       localStorage.setItem('token', data.token)
-      setCurrentUser({ username, token: data.token })
+      setCurrentUser({ username, token: data.token, userId: data.id})
       setIsAuthenticated(true)
       setError(null)
       navigate('/password-manager')
+      setCurrentUser({ username, token: data.token, userId: data.id})
+      setIsAuthenticated(true)
+      setError(null)
     } catch (error) {
       console.error('Login failed:', error)
       setError(error.message)

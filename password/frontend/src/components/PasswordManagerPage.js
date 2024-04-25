@@ -6,11 +6,10 @@ import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { jwtDecode } from 'jwt-decode'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
-  const { currentUser, isAuthenticated } = useAuth()
+  const { currentUser } = useAuth()
   // State variables to store the passwords and the filtered passwords
   const [passwords, setPasswords] = useState([])
   // State variable to store the filtered passwords
@@ -47,14 +46,10 @@ function PasswordManagerPage () {
   // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
     const token = localStorage.getItem('token')
-    const decoded = jwtDecode(token)
-    console.log('decoded:', decoded)
-    const userId = decoded.userId
-    console.log('userId:', userId)
 
     setIsLoading(true)
     try {
-      const endpoint = `http://localhost:3000/api/passwords/user/${userId}`
+      const endpoint = `http://localhost:3000/api/passwords/user/${currentUser.userId}`
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
@@ -75,15 +70,12 @@ function PasswordManagerPage () {
   // Function to handle show shared passwords
   const fetchSharedPasswords = useCallback(async () => {
     const token = localStorage.getItem('token')
-    const decoded = jwtDecode(token)
-    const userId = decoded.userId
-
-    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${userId}`
+    const endpoint = `http://localhost:3000/api/share-requests/passwords/shared/${currentUser.userId}`
     try {
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${currentUser?.token}`
+          Authorization: `Bearer ${token}`
         }
       })
       const data = await response.json()
@@ -97,7 +89,7 @@ function PasswordManagerPage () {
       console.error('Error:', error)
       alert(error.message)
     }
-  }, [currentUser.token])
+  }, [currentUser.userId])
 
   // Fetch the passwords when the component mounts
   useEffect(() => {
@@ -188,10 +180,10 @@ function PasswordManagerPage () {
         }
       )
       const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to delete the password')
-      }
-
+      // if (response.json !== "Password deleted") {
+      //   throw new Error(data.message || 'Failed to delete the password')
+      // }
+      alert('Password deleted successfully')
       fetchPasswords()
     } catch (error) {
       console.error('Error:', error)
@@ -230,8 +222,17 @@ function PasswordManagerPage () {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update password')
       }
-      // Refresh the password list
-      fetchPasswords()
+
+      // Update the state with the new password list
+      setPasswords(prevPasswords => {
+        return prevPasswords.map(p => {
+          if (p._id === _id) {
+            return { ...p, url, password } 
+          }
+          return p
+        })
+      })
+      alert('Update successfully')
     } catch (error) {
       console.error('Error:', error)
       alert(error.message)
@@ -258,7 +259,7 @@ function PasswordManagerPage () {
   }
 
   return (
-    <div className='main-content'>
+    <div className='password-manager-page'>
       <h2>Password Manager</h2>
       {/* Search functionality */}
       <input
@@ -336,11 +337,12 @@ function PasswordManagerPage () {
       ) : (
         <>
           {/* List of passwords */}
-          <ul>
+          <ul className='password-list'>
             {filteredPasswords.map(passwordEntry => (
               <li key={passwordEntry._id}>
                 <div>
                   <strong>URL:</strong> {passwordEntry.url}
+                  <strong>Password:</strong> {passwordEntry.password}
                   <button
                     onClick={() => togglePasswordVisibility(passwordEntry._id)}
                     className='password-toggle'
@@ -351,11 +353,11 @@ function PasswordManagerPage () {
                           ? faEyeSlash
                           : faEye
                       }
+                      className='fa-icon'
                     />
                   </button>
-                  {showPasswordIds.has(passwordEntry._id) && (
-                    <span>{passwordEntry.password}</span>
-                  )}
+                </div>
+                <div className='password-actions'>
                   <CopyToClipboardButton text={passwordEntry.password} />
                   <button onClick={() => handleEdit(passwordEntry)}>
                     Edit
@@ -366,6 +368,9 @@ function PasswordManagerPage () {
                   <button onClick={() => handleShare(passwordEntry)}>
                     Share
                   </button>
+                  {showPasswordIds.has(passwordEntry._id) && (
+                    <span>{passwordEntry.password}</span>
+                  )}
                 </div>
                 <div>
                   <strong>Last Updated:</strong>{' '}
@@ -384,6 +389,7 @@ function PasswordManagerPage () {
               onSave={handleSaveChanges}
             />
           )}
+
           {/*show shared passwords */}
           <h3>Passwords Shared by Others:</h3>
           <ul>

@@ -108,7 +108,7 @@ router.delete('/:id', async (req, res) => {
     if (!deletedPassword) {
       return res.status(404).json({ message: 'Password not found' })
     }
-    res.status(204).json({ message: 'Password deleted' })
+    res.status(200).json({ message: 'Password deleted' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
