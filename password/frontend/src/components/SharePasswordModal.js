@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { useAuth } from '../AuthContext'
 import '../styles/SharePasswordModal.css';
 
 
@@ -7,7 +6,6 @@ const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const { currentUser } = useAuth()
 
   const handleShare = async e => {
     e.preventDefault();

@@ -33,8 +33,8 @@ function PasswordManagerPage () {
   // State variable to store the loading status
   const [isLoading, setIsLoading] = useState(true)
   // share requests
-const [pendingShareRequests, setPendingShareRequests] = useState([]);
-const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
+  const [pendingShareRequests, setPendingShareRequests] = useState([])
+  const [acceptedShareRequests, setAcceptedShareRequests] = useState([])
 
   /**
    * All Fetch functions are defined here
@@ -61,7 +61,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
       const data = await response.json()
       setPasswords(data)
       setFilteredPasswords(data)
-      console.log("data:", data)
+      console.log('data:', data)
     } catch (error) {
       console.error('Error fetching passwords:', error)
       alert(error.message)
@@ -174,8 +174,8 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   // handle edit
   const handleEdit = passwordEntry => {
-    setCurrentPassword(passwordEntry)
     setShowEditModal(true)
+    setCurrentPassword(passwordEntry)
   }
 
   // Function to handle save changes
@@ -222,7 +222,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   // Function to handle sharing a password (opens the SharePasswordModal component)
   const handleShare = passwordEntry => {
-    console.log('Sharing password entry:', passwordEntry);
+    console.log('Sharing password entry:', passwordEntry)
     setCurrentPassword(passwordEntry)
     setShowShareModal(true)
   }
@@ -242,34 +242,40 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   const fetchPendingShareRequests = async () => {
     console.log('userId6:', currentUser.userId)
-    const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=pending`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    const data = await response.json();
+    const response = await fetch(
+      `http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=pending`,
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }
+    )
+    const data = await response.json()
     if (response.ok) {
-      setPendingShareRequests(data); 
+      setPendingShareRequests(data)
     } else {
-      console.error(data.message || 'Failed to fetch pending share requests');
+      console.error(data.message || 'Failed to fetch pending share requests')
     }
-  };
+  }
 
   const fetchAcceptedShareRequests = async () => {
     console.log('userId7:', currentUser.userId)
-    const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=accepted`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    const data = await response.json();
+    const response = await fetch(
+      `http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=accepted`,
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }
+    )
+    const data = await response.json()
     if (response.ok) {
-      setAcceptedShareRequests(data);  
+      setAcceptedShareRequests(data)
     } else {
-      console.error(data.message || 'Failed to fetch accepted share requests');
+      console.error(data.message || 'Failed to fetch accepted share requests')
     }
-  };
-  
+  }
+
   useEffect(() => {
-    fetchAcceptedShareRequests();
-    fetchPendingShareRequests();
-  }, [currentUser.userId]);
+    fetchAcceptedShareRequests()
+    fetchPendingShareRequests()
+  }, [currentUser.userId])
 
   const acceptShareRequest = async id => {
     try {
@@ -398,13 +404,28 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
           <ul className='password-list'>
             {filteredPasswords.map(passwordEntry => (
               <li key={passwordEntry._id}>
-                <div>
-                  <strong>URL:</strong> {passwordEntry.url}
+                <div className='password-info'>
+                  <div>
+                    <strong>URL:</strong> {passwordEntry.url}
                   </div>
-                <div>
-                  <strong>Password:</strong> {passwordEntry.password}
+                  <div>
+                    <strong>Password:</strong>{' '}
+                    {showPasswordIds.has(passwordEntry._id)
+                      ? passwordEntry.password
+                      : '••••••'}
+                  </div>
+                  <div className='last-updated'>
+                    <strong>Last Updated:</strong>{' '}
+                    {new Date(passwordEntry.updatedAt).toLocaleDateString()}{' '}
+                    {new Date(passwordEntry.updatedAt).toLocaleTimeString()}
+                  </div>
                 </div>
                 <div className='password-actions'>
+                  <button
+                    onClick={() => togglePasswordVisibility(passwordEntry._id)}
+                  >
+                    {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
+                  </button>
                   <CopyToClipboardButton text={passwordEntry.password} />
                   <button onClick={() => handleEdit(passwordEntry)}>
                     Edit
@@ -415,14 +436,6 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
                   <button onClick={() => handleShare(passwordEntry)}>
                     Share
                   </button>
-                  {showPasswordIds.has(passwordEntry._id) && (
-                    <span>{passwordEntry.password}</span>
-                  )}
-                </div>
-                <div>
-                  <strong>Last Updated:</strong>{' '}
-                  {new Date(passwordEntry.updatedAt).toLocaleDateString()}{' '}
-                  {new Date(passwordEntry.updatedAt).toLocaleTimeString()}
                 </div>
               </li>
             ))}
@@ -439,9 +452,10 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
           {/* Share password modal or component */}
           {showShareModal && (
-            <SharePasswordModal close={() => setShowShareModal(false)}
-            passwordEntry={currentPassword}
-            currentUser={currentUser}
+            <SharePasswordModal
+              close={() => setShowShareModal(false)}
+              passwordEntry={currentPassword}
+              currentUser={currentUser}
             />
           )}
 
@@ -460,24 +474,24 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
       )}
 
       {/*show shared passwords requests*/}
-        <div>
-          <h3>Pending Share Requests:</h3>
-          <ul>
-            {pendingShareRequests.map(request => (
-              <li key={request.id}>
-                <p>
-                  URL: {request.url} - Shared by: {request.owner}
-                </p>
-                <button onClick={() => acceptShareRequest(request.id)}>
-                  Accept
-                </button>
-                <button onClick={() => rejectShareRequest(request.id)}>
-                  Reject
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div>
+        <h3>Pending Share Requests:</h3>
+        <ul>
+          {pendingShareRequests.map(request => (
+            <li key={request.id}>
+              <p>
+                URL: {request.url} - Shared by: {request.owner}
+              </p>
+              <button onClick={() => acceptShareRequest(request.id)}>
+                Accept
+              </button>
+              <button onClick={() => rejectShareRequest(request.id)}>
+                Reject
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

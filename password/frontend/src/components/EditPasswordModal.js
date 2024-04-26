@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import '../styles/EditPasswordModal.css'
 
 function EditPasswordModal ({ onClose, onSave, currentPassword }) {
   const [url, setUrl] = useState(currentPassword.url)
@@ -15,6 +16,7 @@ function EditPasswordModal ({ onClose, onSave, currentPassword }) {
         <span className='edit-close' onClick={onClose}>
           &times;
         </span>
+        <h2>Share Password</h2>
         <form onSubmit={handleSubmit}>
           <div className='edit-input-group'>
             <label>
