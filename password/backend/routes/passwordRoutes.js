@@ -127,8 +127,7 @@ router.get('/user/:userId', async (req, res) => {
     }
 
     // Map through the fetched passwords and decrypt each password
-    let decryptedPasswords = passwords.map(p => {
-      try {
+    let dec 
         const decryptedPassword = decrypt(p.password)
         return { ...p.toObject(), password: decryptedPassword }
       } catch (error) {
@@ -142,5 +141,9 @@ router.get('/user/:userId', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+
+    //TODO: clasfify the passwords to 2 parts: own passwords, and shared passwords, to display them in different sections in the frontend;
+
+    //possible calssification:if there is no current user object in the share with field, then it is an own password, otherwise it is a shared password
 
 module.exports = router
