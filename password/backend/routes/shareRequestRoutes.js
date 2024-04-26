@@ -94,13 +94,13 @@ router.post('/:id/reject', async (req, res) => {
 // READ: fetch all share requests for a user(receiver) by status
 router.get('/passwords/shared/:userId', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params; 
     const { status } = req.query; 
 
-    const query = {
-      to: userId,
-      status: status,  
-    };
+    let query = { to: userId }; 
+    if (status) {
+      query.status = status; 
+    }
 
     const shareRequests = await ShareRequest.find(query)
       .populate({
@@ -114,10 +114,13 @@ router.get('/passwords/shared/:userId', async (req, res) => {
       .exec();
 
     if (!shareRequests.length) {
-      return res.status(404).json({ message: `No ${status} share requests found for this user.` });
+      return res.status(404).json({ message: `No share requests found with status '${status}' for this user.` });
     }
 
     const response = shareRequests.map(request => {
+      if (!request.passwordId) {
+        throw new Error('Associated password information is missing.');
+      }
       const decryptedPassword = decrypt(request.passwordId.password); 
       return {
         id: request._id,

@@ -37,13 +37,17 @@ export function AuthProvider ({ children }) {
         throw new Error(data.message || 'Error occurred during login')
       }
       localStorage.setItem('token', data.token)
-      localStorage.setItem('userId', data.id)
+      localStorage.setItem('userId', data.user.id)
+      console.log('userId1:', data.user.id)
       
-      setCurrentUser({ username, token: data.token, userId: data.id})
+      setCurrentUser({ username, token: data.token, userId: data.user.id})
+      console.log('current user:', currentUser)
+      console.log('userId2:', data.user.id)
       setIsAuthenticated(true)
       setError(null)
       navigate('/password-manager')
-      setCurrentUser({ username, token: data.token, userId: data.id})
+      setCurrentUser({ username, token: data.token, userId: data.user.id})
+      console.log('userId3:', data.user.id)
       setIsAuthenticated(true)
       setError(null)
     } catch (error) {
@@ -55,9 +59,14 @@ export function AuthProvider ({ children }) {
   }
 
   const logout = () => {
+    console.log('logging out')
+    console.log('current user1:', currentUser)
     localStorage.removeItem('token')
+    console.log('current user2', currentUser)
     setCurrentUser(null)
+    console.log('current user3:', currentUser)
     setIsAuthenticated(false)
+    console.log('current user4:', currentUser)
   }
 
   return (

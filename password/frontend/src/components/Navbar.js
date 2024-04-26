@@ -13,9 +13,9 @@ function Navbar () {
   const [showRegisterModal, setShowRegisterModal] = useState(false)
 
   const handleLogout = () => {
-    logout()
     navigate('/')
     setIsMenuOpen(false)
+    logout()
   }
 
   return (

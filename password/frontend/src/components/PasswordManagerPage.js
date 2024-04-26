@@ -9,7 +9,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
-  const { currentUser } = useAuth()
+  const { currentUser, isAuthenticated } = useAuth()
   // State variables to store the passwords and the filtered passwords
   const [passwords, setPasswords] = useState([])
   // State variable to store the filtered passwords
@@ -51,6 +51,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
     setIsLoading(true)
     try {
       const endpoint = `http://localhost:3000/api/passwords/user/${currentUser.userId}`
+      console.log('userId4:', currentUser.userId)
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
@@ -217,7 +218,8 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   // Function to handle sharing a password (opens the SharePasswordModal component)
   const handleShare = passwordEntry => {
-    setCurrentPassword(passwordEntry
+    console.log('Sharing password entry:', passwordEntry);
+    setCurrentPassword(passwordEntry)
     setShowShareModal(true)
   }
 
@@ -235,6 +237,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
   }
 
   const fetchPendingShareRequests = async () => {
+    console.log('userId6:', currentUser.userId)
     const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=pending`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
@@ -247,6 +250,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
   };
 
   const fetchAcceptedShareRequests = async () => {
+    console.log('userId7:', currentUser.userId)
     const response = await fetch(`http://localhost:3000/api/passwords/shared/${currentUser.userId}?status=accepted`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
@@ -444,7 +448,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
           {showShareModal && (
             <SharePasswordModal close={() => setShowShareModal(false)}
             passwordEntry={currentPassword}
-            fromUser={currentUser}
+            currentUser={currentUser}
             />
           )}
 

@@ -1,36 +1,51 @@
 import React, { useState } from 'react';
+// import { useAuth } from '../AuthContext'
 import '../styles/SharePasswordModal.css';
 
-const SharePasswordModal = ({ close, passwordEntry, fromUser }) => {
+
+const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // const { currentUser } = useAuth()
 
   const handleShare = async e => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
+
+    const passwordId = passwordEntry?._id;
+    console.log('passwordId to share:', passwordId); 
+
+    if (!passwordId) {
+      setError('Password ID is missing.');
+      setIsSubmitting(false);
+      return;
+    }
+  
     const token = localStorage.getItem('token');
     if (!token) {
       setError('No authentication token found. Please login again.');
       setIsSubmitting(false);
       return;
     }
+
+    
     try {
-      const passwordId = passwordEntry.id;
+      const passwordId = passwordEntry._id;
       console.log('passwordId:', passwordId);
-      const fromUserId = fromUser._id;
-      console.log('fromUserId:', fromUserId);
+      const fromUserId = currentUser.userId;
+      console.log('fromUserId:', currentUser.userId);
       const response = await fetch('/api/share-requests/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          fromUserId: fromUserId,
+          fromUserId: currentUser.userId,
           toUsername: username,
-          passwordId: passwordId
+          passwordId
         })
       });
       console.log('Sending share request:', { fromUserId, username, passwordId });
