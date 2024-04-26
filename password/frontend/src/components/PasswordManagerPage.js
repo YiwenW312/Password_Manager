@@ -217,7 +217,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
 
   // Function to handle sharing a password (opens the SharePasswordModal component)
   const handleShare = passwordEntry => {
-    setCurrentPassword(passwordEntry)
+    setCurrentPassword(passwordEntry
     setShowShareModal(true)
   }
 
