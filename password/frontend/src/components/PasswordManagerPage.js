@@ -9,7 +9,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
-  const { currentUser, isAuthenticated } = useAuth()
+  const { currentUser } = useAuth()
   // State variables to store the passwords and the filtered passwords
   const [passwords, setPasswords] = useState([])
   // State variable to store the filtered passwords
@@ -47,7 +47,6 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
   // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
     const token = localStorage.getItem('token')
-
     setIsLoading(true)
     try {
       const endpoint = `http://localhost:3000/api/passwords/user/${currentUser.userId}`
@@ -56,11 +55,13 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
       })
+      console.log('response:', response)
       if (!response.ok)
         throw new Error(`HTTP error! Status: ${response.status}`)
       const data = await response.json()
       setPasswords(data)
       setFilteredPasswords(data)
+      console.log("data:", data)
     } catch (error) {
       console.error('Error fetching passwords:', error)
       alert(error.message)
@@ -90,6 +91,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
   // Function to handle the change in the search term
   const handleSearchChange = e => {
     setSearchTerm(e.target.value)
+    console.log('userId-1:', currentUser.userId)
   }
 
   /**
@@ -106,6 +108,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
     e.preventDefault()
     const method = 'POST'
     const endpoint = 'http://localhost:3000/api/passwords/newPasswords'
+    console.log('userId-2:', currentUser.userId)
     const bodyContent = {
       url: newUrl,
       password: newPassword,
@@ -123,6 +126,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
         },
         body: JSON.stringify(bodyContent)
       })
+      console.log('userId-3:', currentUser.userId)
       const data = await response.json()
       if (!response.ok) {
         throw new Error(
@@ -136,7 +140,6 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
       setPasswordLength(12)
       setUseNumbers(true)
       setUseSymbols(false)
-
       fetchPasswords()
     } catch (error) {
       console.error('Error:', error)
@@ -156,6 +159,7 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
           }
         }
       )
+      console.log('userId-?:', currentUser.userId)
       const data = await response.json()
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete the password')
@@ -396,20 +400,9 @@ const [acceptedShareRequests, setAcceptedShareRequests] = useState([]);
               <li key={passwordEntry._id}>
                 <div>
                   <strong>URL:</strong> {passwordEntry.url}
+                  </div>
+                <div>
                   <strong>Password:</strong> {passwordEntry.password}
-                  <button
-                    onClick={() => togglePasswordVisibility(passwordEntry._id)}
-                    className='password-toggle'
-                  >
-                    <FontAwesomeIcon
-                      icon={
-                        showPasswordIds.has(passwordEntry._id)
-                          ? faEyeSlash
-                          : faEye
-                      }
-                      className='fa-icon'
-                    />
-                  </button>
                 </div>
                 <div className='password-actions'>
                   <CopyToClipboardButton text={passwordEntry.password} />

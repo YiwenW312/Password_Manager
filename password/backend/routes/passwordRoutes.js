@@ -117,10 +117,9 @@ router.delete('/:id', async (req, res) => {
 // READ: Fetch all passwords for a user
 router.get('/user/:userId', async (req, res) => {
   try {
-    const passwords = await Password.find({})
+    const passwords = await Password.find({ })
       .populate('userId', 'username')
       .exec()
-    console.log('Passwords fetched:', passwords)
     if (!passwords.length) {
       return res
         .status(404)
@@ -137,8 +136,6 @@ router.get('/user/:userId', async (req, res) => {
         return { ...p.toObject(), password: 'Decryption failed' }
       }
     })
-
-    console.log('Decrypted Passwords:', decryptedPasswords)
     res.json(decryptedPasswords)
   } catch (error) {
     console.error('Error fetching passwords:', error)
