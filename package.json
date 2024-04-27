@@ -1,11 +1,32 @@
 {
+  "name": "yiwen_wang_wen_xie_project3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./backend/index.js",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
     "build": "npm run build -ws --if-present",
-    "prod": "npm run start -w backend"
+    "prod": "npm run start -w backend",
+    "start": "node backend/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YiwenW312/Yiwen-Wang-Wen-Xie-Project3.git"
+  },
+  "author": "yiwen & wen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YiwenW312/Yiwen-Wang-Wen-Xie-Project3/issues"
+  },
+  "homepage": "https://github.com/YiwenW312/Yiwen-Wang-Wen-Xie-Project3#readme",
   "dependencies": {
-    "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
   }
 }
