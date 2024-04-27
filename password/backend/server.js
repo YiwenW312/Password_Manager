@@ -13,9 +13,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
-app.use(cors({
-  origin: '*' 
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -39,7 +37,7 @@ console.log('dirname', __dirname);
 
 // Handles any requests that don't match the ones above
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'build', 'index.html'));
 });
 
 // Basic error handler
