@@ -32,7 +32,8 @@ app.use('/api/passwords', authenticateToken, passwordRoutes);
 app.use('/api/share-requests', authenticateToken, shareRequestRoutes);
 
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '..', 'frontend','build')));
+console.log('dirname', __dirname);  
 
 // Handles any requests that don't match the ones above
 app.get('*', (req, res) => {
