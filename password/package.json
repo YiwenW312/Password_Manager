@@ -9,6 +9,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "jwt-decode": "^4.0.0",
+    "react-scripts": "^5.0.1",
     "serve": "^11.3.2"
   }
 }
