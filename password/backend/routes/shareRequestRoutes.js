@@ -14,57 +14,78 @@ const router = express.Router()
 // CREATE a new share request
 router.post('/', async (req, res) => {
   try {
-    const { fromUserId, toUsername } = req.body //TODO: check all passwordid removed
-    const toUser = await User.findOne({ username: toUsername })
-    if (!toUser) {
-      return res.status(404).json({ message: 'User to share with not found.' })
+    const { fromUserId, toUsername } = req.body;
+    const toUser = await User.findOne({ username: toUsername });
+
+    if (fromUserId === toUser._id.toString()) {
+      return res.status(400).json({ message: 'Cannot share a password with yourself.' });
     }
-    //TODO: check if the password is already shared with the user (accepted or pending)
-    //TODO: do not add user to sharewith untill accepted (do not appear in password's data at all)
+    
+    if (!toUser) {
+      return res.status(404).json({ message: 'User to share with not found.' });
+    }
+
+    // Check if the password is already shared with the user (accepted or pending)
+    const existingRequest = await ShareRequest.findOne({
+      $or: [
+        { from: fromUserId, to: toUser._id },
+        { from: toUser._id, to: fromUserId }
+      ],
+      status: { $in: ['pending', 'accepted'] }
+    });
+
+    if (existingRequest) {
+      return res.status(409).json({ message: 'A share request already exists or the password is already shared.' });
+    }
+
     const newShareRequest = new ShareRequest({
       from: fromUserId,
       to: toUser._id,
       status: 'pending'
-    })
-    await newShareRequest.save()
-    res.status(200).json(newShareRequest)
+    });
+
+    await newShareRequest.save();
+    res.status(201).json(newShareRequest);
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
+
 
 // CREATE: accept Share Request
 router.post('/:id/accept', async (req, res) => {
   try {
-    const shareRequestId = req.params.id
-    const shareRequest = await ShareRequest.findById(shareRequestId)
+    const shareRequestId = req.params.id;
+    const shareRequest = await ShareRequest.findById(shareRequestId);
     if (!shareRequest) {
-      return res.status(404).json({ message: 'Share request not found.' })
+      return res.status(404).json({ message: 'Share request not found.' });
     }
 
-    
     if (shareRequest.status === 'accepted') {
-      return res.status(400).json({ message: 'Share request already accepted.' })
-    }
-    if (shareRequest.status === 'rejected') {
-      return res.status(400).json({ message: 'Share request already rejected.' })
+      return res.status(400).json({ message: 'Share request already accepted.' });
     }
 
-    shareRequest.status = 'accepted'
-    await shareRequest.save()
-    const updatedPassword = await Password.findByIdAndUpdate(
-      shareRequest.passwordId,
-      { $addToSet: { sharedWith: shareRequest.to } },//TODO: do not add user to sharewith untill accepted;
-      { new: true }
-    )
+    // Update the status to 'accepted'
+    shareRequest.status = 'accepted';
+    await shareRequest.save();
 
-//TODO: share all passwords with each other - 1. add Touser object to all owner's password' share with; 2. and add owner's user object to all toUser's password' shared with
+    // Grant access to both users
+    const { from, to } = shareRequest;
+    const fromUserPasswords = await Password.find({ userId: from });
+    const toUserPasswords = await Password.find({ userId: to });
 
-    res.json({ message: 'Share request accepted.', updatedPassword })
+    // Add each user to the other's password sharedWith field
+    await Promise.all([
+      ...fromUserPasswords.map(pwd => Password.findByIdAndUpdate(pwd._id, { $addToSet: { sharedWith: to } })),
+      ...toUserPasswords.map(pwd => Password.findByIdAndUpdate(pwd._id, { $addToSet: { sharedWith: from } }))
+    ]);
+
+    res.json({ message: 'Share request accepted.' });
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
+
 
 // CREATE: reject Share Request
 router.post('/:id/reject', async (req, res) => {

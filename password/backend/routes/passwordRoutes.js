@@ -28,26 +28,13 @@ router.post('/newPasswords', authenticateToken, async (req, res) => {
     return res.status(400).json({ message: 'URL is required.' })
   }
 
-  if (
-    length < 4 ||
-    length > 50 ||
-    (!useLetters && !useNumbers && !useSymbols)
-  ) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid password generation parameters.' })
-  }
-
   let password = clientPassword
 
   if (!password) {
-    // Generate password only if it's not provided
-    password = generateSecurePassword(
-      length,
-      useLetters,
-      useNumbers,
-      useSymbols
-    )
+    if (length < 4 || length > 50 || (!useLetters && !useNumbers && !useSymbols)) {
+      return res.status(400).json({ message: 'Invalid password generation parameters. Password length must between 4-50. Password must include at least one of three: letter, symbol or number.' });
+    }
+    password = generateSecurePassword(length, useLetters, useNumbers, useSymbols);
   }
 
   if (!password) {
@@ -117,33 +104,50 @@ router.delete('/:id', async (req, res) => {
 // READ: Fetch all passwords for a user
 router.get('/user/:userId', async (req, res) => {
   try {
-    const passwords = await Password.find({ })
+    const { userId } = req.params;
+
+    // Fetching passwords owned by the user and where the user is in the sharedWith array
+    const ownedPasswords = await Password.find({ userId })
       .populate('userId', 'username')
-      .exec()
-    if (!passwords.length) {
-      return res
-        .status(404)
-        .json({ message: 'No passwords found for this user.' })
+      .exec();
+
+    const sharedPasswords = await Password.find({ sharedWith: userId })
+      .populate('userId', 'username')
+      .exec();
+
+    if (!ownedPasswords.length && !sharedPasswords.length) {
+      return res.status(404).json({ message: 'No passwords found for this user.' });
     }
 
-    // Map through the fetched passwords and decrypt each password
-    let dec 
-        const decryptedPassword = decrypt(p.password)
-        return { ...p.toObject(), password: decryptedPassword }
+    // Decrypt passwords and classify them
+    const decryptPassword = (password) => {
+      try {
+        return decrypt(password);
       } catch (error) {
-        console.error('Decryption error:', error)
-        return { ...p.toObject(), password: 'Decryption failed' }
+        console.error('Decryption error:', error);
+        return 'Decryption failed';
       }
-    })
-    res.json(decryptedPasswords)
+    };
+
+    const decryptedOwnedPasswords = ownedPasswords.map(p => ({
+      ...p.toObject(),
+      password: decryptPassword(p.password),
+      type: 'own'
+    }));
+
+    const decryptedSharedPasswords = sharedPasswords.map(p => ({
+      ...p.toObject(),
+      password: decryptPassword(p.password),
+      type: 'shared'
+    }));
+
+    // Combining both lists to send as a single response
+    res.json([...decryptedOwnedPasswords, ...decryptedSharedPasswords]);
   } catch (error) {
-    console.error('Error fetching passwords:', error)
-    res.status(500).json({ error: error.message })
+    console.error('Error fetching passwords:', error);
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
-    //TODO: clasfify the passwords to 2 parts: own passwords, and shared passwords, to display them in different sections in the frontend;
+module.exports = router;
 
-    //possible calssification:if there is no current user object in the share with field, then it is an own password, otherwise it is a shared password
-
-module.exports = router
