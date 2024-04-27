@@ -43,7 +43,7 @@ function PasswordManagerPage () {
   const fetchPasswords = useCallback(async () => {
     const token = localStorage.getItem('token')
     try {
-      const endpoint = `http://localhost:3000/api/passwords/user/${currentUser.userId}`
+      const endpoint = `http://localhost:8000/api/passwords/user/${currentUser.userId}`
       console.log('userId4:', currentUser.userId)
       const response = await fetch(endpoint, {
         method: 'GET',
@@ -99,7 +99,7 @@ function PasswordManagerPage () {
   const handlePasswordCreation = async e => {
     e.preventDefault()
     const method = 'POST'
-    const endpoint = 'http://localhost:3000/api/passwords/newPasswords'
+    const endpoint = 'http://localhost:8000/api/passwords/newPasswords'
     console.log('userId-2:', currentUser.userId)
     const bodyContent = {
       url: newUrl,
@@ -143,7 +143,7 @@ function PasswordManagerPage () {
   const handleDelete = async id => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/passwords/${id}`,
+        `http://localhost:8000/api/passwords/${id}`,
         {
           method: 'DELETE',
           headers: {
@@ -181,7 +181,7 @@ function PasswordManagerPage () {
     const token = localStorage.getItem('token')
     try {
       const response = await fetch(
-        `http://localhost:3000/api/passwords/${_id}`,
+        `http://localhost:8000/api/passwords/${_id}`,
         {
           method: 'PUT',
           headers: {
@@ -230,7 +230,7 @@ function PasswordManagerPage () {
     const token = localStorage.getItem('token')
     try {
       const response = await fetch(
-        `http://localhost:3000/api/share-requests/${currentUser.userId}/pending`,
+        `http://localhost:8000/api/share-requests/${currentUser.userId}/pending`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -256,7 +256,7 @@ function PasswordManagerPage () {
     const token = localStorage.getItem('token')
     try {
       const response = await fetch(
-        `http://localhost:3000/api/share-requests/${id}/accept`,
+        `http://localhost:8000/api/share-requests/${id}/accept`,
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
@@ -276,7 +276,7 @@ function PasswordManagerPage () {
     const token = localStorage.getItem('token')
     try {
       const response = await fetch(
-        `http://localhost:3000/api/share-requests/${id}/reject`,
+        `http://localhost:8000/api/share-requests/${id}/reject`,
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
