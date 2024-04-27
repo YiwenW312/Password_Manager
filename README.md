@@ -18,18 +18,18 @@
 5. add Cryptographically Secure Passwords
 
 # Instructions
-- To Run this App:
-1. Frontend: 
+- To Run this App at local host 3000:
+1. direct to Frontend: 
     - `cd password`
     - `cd frontend`
     - `npm install`
     - `npm start`
-2. Backend:
+2. new terminal, direct to Backend:
     - `cd password`
     - `cd backend`
-    - `npm install express mongoose cors cookie-parser dotenv`
+    - `npm install`
     - `npm start`
-
+- Public URL: https://yiwen-wang-wen-xie-project3.onrender.com/
 
 
 # Introduction
