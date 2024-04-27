@@ -30,6 +30,23 @@
     border-radius: 4px;
 }
 
+.nav-item-logout {
+    cursor: pointer;
+    margin-right: 25px;
+    color: #ECF0F1;
+    background-color: none;
+    text-decoration: none;
+    padding: 8px 8px;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.nav-item-logout:hover,
+.nav-item-logout:focus {
+    background-color: #18BC9C;
+    color: #2C3E50;
+    border-radius: 4px;
+}
+
 
 .nav-toggle {
     display: none;

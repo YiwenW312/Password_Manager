@@ -44,18 +44,18 @@ function Navbar() {
             >
               {`${currentUser.username}'s Password Manager`}
             </Link>
-            <button className='nav-item' onClick={handleLogout}>
+            <button className='nav-item-logout' onClick={handleLogout}>
               Logout
             </button>
           </>
         ) : (
           <>
-            <button className='nav-item' onClick={() => setShowLoginModal(true)}>
+            <Link className='nav-item' onClick={() => setShowLoginModal(true)}>
               Login
-            </button>
-            <button className='nav-item' onClick={() => setShowRegisterModal(true)}>
+            </Link>
+            <Link className='nav-item' onClick={() => setShowRegisterModal(true)}>
               Register
-            </button>
+            </Link>
           </>
         )}
       </div>
