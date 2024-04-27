@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/SharePasswordModal.css';
 
-
-const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
+const SharePasswordModal = ({ close, currentUser }) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,15 +11,6 @@ const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
     setError('');
     setIsSubmitting(true);
 
-    const passwordId = passwordEntry?._id;
-    console.log('passwordId to share:', passwordId); 
-
-    if (!passwordId) {
-      setError('Password ID is missing.');
-      setIsSubmitting(false);
-      return;
-    }
-  
     const token = localStorage.getItem('token');
     if (!token) {
       setError('No authentication token found. Please login again.');
@@ -28,12 +18,7 @@ const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
       return;
     }
 
-    
     try {
-      const passwordId = passwordEntry._id;
-      console.log('passwordId:', passwordId);
-      const fromUserId = currentUser.userId;
-      console.log('fromUserId:', currentUser.userId);
       const response = await fetch('/api/share-requests/', {
         method: 'POST',
         headers: {
@@ -43,22 +28,18 @@ const SharePasswordModal = ({ close, passwordEntry, currentUser}) => {
         body: JSON.stringify({
           fromUserId: currentUser.userId,
           toUsername: username,
-          passwordId
         })
       });
-      console.log('Sending share request:', { fromUserId, username, passwordId });
 
-
-      console.log('response:', response);
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Unable to share password.');
+        throw new Error(data.message || 'Unable to send share request.');
       }
 
-      alert('Password shared successfully.');
+      alert('Share request sent successfully.');
       handleModalClose();
     } catch (error) {
-      console.error('Sharing failed:', error);
+      console.error('Send failed:', error);
       setError(error.message);
       setIsSubmitting(false);
     }

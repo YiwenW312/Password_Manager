@@ -8,11 +8,13 @@ const Password = require('../models/Password')
 const User = require('../models/User')
 const ShareRequest = require('../models/ShareRequest')
 const { decrypt } = require('../utils/cryptoHelper')
+const { authenticateToken } = require('../authMiddleware')
+
 // Instantiate a Router
 const router = express.Router()
 
 // CREATE a new share request
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const { fromUserId, toUsername } = req.body;
     const toUser = await User.findOne({ username: toUsername });
@@ -53,7 +55,7 @@ router.post('/', async (req, res) => {
 
 
 // CREATE: accept Share Request
-router.post('/:id/accept', async (req, res) => {
+router.post('/:id/accept', authenticateToken, async (req, res) => {
   try {
     const shareRequestId = req.params.id;
     const shareRequest = await ShareRequest.findById(shareRequestId);
@@ -88,7 +90,7 @@ router.post('/:id/accept', async (req, res) => {
 
 
 // CREATE: reject Share Request
-router.post('/:id/reject', async (req, res) => {
+router.post('/:id/reject', authenticateToken, async (req, res) => {
   try {
     const shareRequestId = req.params.id
     const shareRequest = await ShareRequest.findById(shareRequestId)
@@ -103,53 +105,36 @@ router.post('/:id/reject', async (req, res) => {
   }
 })
 
-// READ: fetch all share requests for a user(receiver) by status
-router.get('/passwords/shared/:userId', async (req, res) => {
+// GET all pending share requests for a user
+router.get('/:userId/pending', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.params; 
-    const { status } = req.query; 
+    const { userId } = req.params;
 
-    let query = { to: userId }; 
-    if (status) {
-      query.status = status; 
-    }
-
-    const shareRequests = await ShareRequest.find(query)
-      .populate({
-        path: 'passwordId',
-        populate: {
-          path: 'userId',
-          select: 'username'
-        }
-      })
-      .populate('from', 'username') 
-      .exec();
+    const shareRequests = await ShareRequest.find({
+      to: userId,
+      status: 'pending'
+    }).populate('from', 'username').exec();
 
     if (!shareRequests.length) {
-      return res.status(404).json({ message: `No share requests found with status '${status}' for this user.` });
+      return res.status(404).json({ message: 'No pending share requests found.' });
     }
 
-    const response = shareRequests.map(request => {
-      if (!request.passwordId) {
-        throw new Error('Associated password information is missing.');
-      }
-      const decryptedPassword = decrypt(request.passwordId.password); 
-      return {
-        id: request._id,
-        url: request.passwordId.url,
-        owner: request.passwordId.userId.username,
-        from: request.from.username,
-        password: decryptedPassword,
-        status: request.status
-      };
-    });
+    // Formatting the response
+    const response = shareRequests.map(request => ({
+      id: request._id,
+      fromUser: {
+        id: request.from._id,
+        username: request.from.username,
+      },
+      createdAt: request.createdAt,
+      status: request.status
+    }));
 
     res.json(response);
   } catch (error) {
-    console.error('Fetch Share Requests Error:', error);
+    console.error('Error fetching pending share requests:', error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router

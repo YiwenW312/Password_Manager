@@ -1,22 +1,30 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../AuthContext'
-import LoginModal from './LoginModal'
-import RegisterModal from './RegisterModal'
-import '../styles/Navbar.css'
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import LoginModal from './LoginModal';
+import RegisterModal from './RegisterModal';
+import '../styles/Navbar.css';
 
-function Navbar () {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const navigate = useNavigate()
-  const { currentUser, isAuthenticated, logout } = useAuth()
-  const [showLoginModal, setShowLoginModal] = useState(false)
-  const [showRegisterModal, setShowRegisterModal] = useState(false)
+function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [readyToLogout, setReadyToLogout] = useState(false);
 
   const handleLogout = () => {
-    navigate('/')
-    setIsMenuOpen(false)
-    logout()
-  }
+    navigate('/');
+    setIsMenuOpen(false);
+    setReadyToLogout(true);
+  };
+
+  useEffect(() => {
+    if (readyToLogout) {
+      logout();
+      setReadyToLogout(false); 
+    }
+  }, [readyToLogout, logout]);
 
   return (
     <nav className='navbar'>
@@ -36,21 +44,18 @@ function Navbar () {
             >
               {`${currentUser.username}'s Password Manager`}
             </Link>
-            <Link className='nav-item' onClick={handleLogout}>
+            <button className='nav-item' onClick={handleLogout}>
               Logout
-            </Link>
+            </button>
           </>
         ) : (
           <>
-            <Link className='nav-item' onClick={() => setShowLoginModal(true)}>
+            <button className='nav-item' onClick={() => setShowLoginModal(true)}>
               Login
-            </Link>
-            <Link
-              className='nav-item'
-              onClick={() => setShowRegisterModal(true)}
-            >
+            </button>
+            <button className='nav-item' onClick={() => setShowRegisterModal(true)}>
               Register
-            </Link>
+            </button>
           </>
         )}
       </div>
@@ -59,7 +64,7 @@ function Navbar () {
         <RegisterModal close={() => setShowRegisterModal(false)} />
       )}
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;

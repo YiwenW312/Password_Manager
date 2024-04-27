@@ -16,7 +16,7 @@ function EditPasswordModal ({ onClose, onSave, currentPassword }) {
         <span className='edit-close' onClick={onClose}>
           &times;
         </span>
-        <h2>Share Password</h2>
+        <h2>Update Password</h2>
         <form onSubmit={handleSubmit}>
           <div className='edit-input-group'>
             <label>
