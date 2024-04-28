@@ -93,6 +93,7 @@ function PasswordManagerPage () {
       password: newPassword,
       useNumbers,
       useSymbols,
+      useLetters,
       length: passwordLength
     }
     try {
@@ -103,12 +104,14 @@ function PasswordManagerPage () {
       })
       const data = response.data
       if (response.status === 201) {
+        
         // Password successfully created
         setNewUrl('')
         setNewPassword('')
         setPasswordLength(12)
         setUseNumbers(true)
         setUseSymbols(false)
+        setUseLetters(true)
         fetchPasswords()
         alert('Password successfully created')
       } else {
