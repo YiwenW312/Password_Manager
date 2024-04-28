@@ -414,25 +414,29 @@ function PasswordManagerPage () {
         />
       )}
       {/*pending request*/}
-      <h3>Pending Share Requests:</h3>
-      <p>If you accept the request, you will see each other's passwords.</p>
-      <ul>
-        {Array.isArray(pendingShareRequests) &&
-          pendingShareRequests.map(request => (
-            <li key={request.id}>
-              <p>
-                <strong>{request.fromUser.username}</strong> want to share
-                passwords with you!
-              </p>
-              <button onClick={() => handleAcceptShareRequest(request.id)}>
-                Accept
-              </button>
-              <button onClick={() => handleRejectShareRequest(request.id)}>
-                Reject
-              </button>
-            </li>
-          ))}
-      </ul>
+      <div className='share-request'>
+        <h3>Pending Share Requests:</h3>
+        <p>If you accept the request, you will see each other's passwords.</p>
+        <ul>
+          {Array.isArray(pendingShareRequests) &&
+            pendingShareRequests.map(request => (
+              <li key={request.id}>
+                <p>
+                  <strong>{request.fromUser.username}</strong> want to share
+                  passwords with you!
+                </p>
+                <div className='button-container'>
+                  <button onClick={() => handleAcceptShareRequest(request.id)}>
+                    Accept
+                  </button>
+                  <button onClick={() => handleRejectShareRequest(request.id)}>
+                    Reject
+                  </button>
+                </div>
+              </li>
+            ))}
+        </ul>
+      </div>
     </div>
   )
 }
