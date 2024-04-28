@@ -66,16 +66,11 @@ export function AuthProvider ({ children }) {
     }
 }
 
-const logout = () => {
-  try {
-      localStorage.removeItem('token');
-      setCurrentUser(null);
-      setIsAuthenticated(false);
-  } catch (error) {
-      console.error('Failed to logout:', error);
+  const logout = () => {
+    localStorage.removeItem('token')
+    setCurrentUser(null)
+    setIsAuthenticated(false)
   }
-};
-
 
   return (
     <AuthContext.Provider
