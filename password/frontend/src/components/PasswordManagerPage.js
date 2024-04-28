@@ -277,28 +277,13 @@ function PasswordManagerPage () {
 
   return (
     <div className='password-manager-page'>
-      <h2>Password Manager</h2>
-      {/*serch bar*/}
-      <input
-        type='text'
-        placeholder='Search & filter your passwords'
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-      {/* <button
-        onClick={() =>
-          setFilteredPasswords(
-            passwords.filter(p =>
-              p.url.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-          )
-        }
-      >
-        Search
-      </button> */}
+      <div className='main-content'>
+      <h1>Password Manager</h1>
+      <p>Keep your passwords safe and accessible.</p>
+      </div>
 
       {/* Add password */}
-      <h3>Add Password</h3>
+      <h2>Save Your Password</h2>
       <form onSubmit={handlePasswordCreation}>
         <input
           type='text'
@@ -360,7 +345,29 @@ function PasswordManagerPage () {
       </form>
 
       {/*password list*/}
-      <h3>Your Passwords List</h3>
+      <h2>Your Passwords List</h2>
+      {/*share button*/}
+      <button onClick={() => setShowShareModal(true)}>
+        Send Share Password Request to Others
+      </button>
+      {/*serch bar*/}
+      <input
+        type='text'
+        placeholder='Search & filter your passwords'
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
+      {/* <button
+        onClick={() =>
+          setFilteredPasswords(
+            passwords.filter(p =>
+              p.url.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+          )
+        }
+      >
+        Search
+      </button> */}
       <ul className='password-list'>
         {filteredPasswords.map(passwordEntry => (
           <li key={passwordEntry._id}>
@@ -430,14 +437,9 @@ function PasswordManagerPage () {
         />
       )}
 
-      {/*share button*/}
-      <button onClick={() => setShowShareModal(true)}>
-        Share Password to Others
-      </button>
-
       {/*pending request*/}
       <div className='share-request'>
-        <h3>Pending Share Requests:</h3>
+        <h2>Pending Share Requests:</h2>
         <p>If you accept the request, you will see each other's passwords.</p>
         {Array.isArray(pendingShareRequests) &&
         pendingShareRequests.length > 0 ? (
