@@ -21,17 +21,18 @@
   
   .nav-item-logout {
     cursor: pointer;
-    margin-left: 25px; /* Adjust margin */
+    margin-left: 25px;
     color: #ECF0F1;
     background: none;
     border: none;
     transition: color 0.3s ease-in-out;
-    text-decoration: underline;
+    text-decoration: none;
   }
   
   .nav-item-logout:hover,
   .nav-item-logout:focus {
     color: #18BC9C;
+    color: #2C3E50;
     border-radius: 4px;
   }
   

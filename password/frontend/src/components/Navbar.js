@@ -35,18 +35,19 @@ function Navbar () {
         {isAuthenticated && (
           <div className='nav-item-container'>
             <Link
-              to='/password-manager'
-              className='nav-item'
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {`${currentUser.username}'s Password Manager`}
-            </Link>
-            <Link
               to='/'
               className='nav-item'
               onClick={() => setIsMenuOpen(false)}
             >
               Home
+            </Link>
+
+            <Link
+              to='/password-manager'
+              className='nav-item'
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {`${currentUser.username}'s Password Manager`}
             </Link>
             <button className='nav-item-logout' onClick={handleLogout}>
               Logout
@@ -55,6 +56,13 @@ function Navbar () {
         )}
         {!isAuthenticated && (
           <>
+            <Link
+              to='/'
+              className='nav-item'
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
             <Link className='nav-item' onClick={() => setShowLoginModal(true)}>
               Login
             </Link>
