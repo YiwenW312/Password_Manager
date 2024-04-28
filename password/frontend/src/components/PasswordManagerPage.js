@@ -279,7 +279,7 @@ function PasswordManagerPage () {
       {/*serch bar*/}
       <input
         type='text'
-        placeholder='Search passwords'
+        placeholder='Search & filter your passwords'
         value={searchTerm}
         onChange={handleSearchChange}
       />
@@ -356,15 +356,16 @@ function PasswordManagerPage () {
         {filteredPasswords.map(passwordEntry => (
           <li key={passwordEntry._id}>
             <div className='password-info'>
-              <strong>URL:</strong> {passwordEntry.url}
+              <p><strong>URL:</strong> {passwordEntry.url}
+
               <strong>Password:</strong>{' '}
               {showPasswordIds.has(passwordEntry._id)
                 ? passwordEntry.password
-                : '••••••'}
-              <strong>Last Updated:</strong>{' '}
-              {new Date(passwordEntry.updatedAt).toLocaleString()}
+                : '••••••'}</p>
+              <p><strong>Last Updated:</strong>{' '}
+              {new Date(passwordEntry.updatedAt).toLocaleString()}</p>
               {passwordEntry.type === 'shared' && (
-                <p>Password owner: {passwordEntry.userId.username}</p>
+                <p><strong>Password owner:</strong> {passwordEntry.userId.username}</p>
               )}
             </div>
             <div className='password-actions'>

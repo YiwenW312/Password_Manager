@@ -16,7 +16,7 @@
 
 .nav-item-container {
   display: flex;
-  align-items: center; /* Align items vertically */
+  align-items: center; 
 }
 
 .nav-item-logout {
@@ -27,14 +27,13 @@
   border: none;
   transition: color 0.3s ease-in-out;
   text-decoration: none;
-  padding: 8px 12px; /* Added padding */
-  font-size: 16px; /* Adjusted font size */
+  padding: 10px 14px; 
+  font-size: 16px;
 }
 
 .nav-item-logout:hover,
 .nav-item-logout:focus {
-  color: #18BC9C;
-  background-color: #2C3E50; /* Match background color */
+  background: #18BC9C;
   border-radius: 4px;
 }
 
