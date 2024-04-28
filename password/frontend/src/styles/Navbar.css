@@ -34,17 +34,20 @@
     cursor: pointer;
     margin-right: 25px;
     color: #ECF0F1;
-    background: none; /* Remove background */
-    border: none; /* Remove border */
-    padding: 8px 8px;
-    transition: color 0.3s ease-in-out; /* Only transition color */
-    text-decoration: underline; /* Add underline */
+    background: none;
+    border: none;
+    transition: color 0.3s ease-in-out;
+    text-decoration: underline;
   }
   
   .nav-item-logout:hover,
   .nav-item-logout:focus {
-    color: #18BC9C; /* Change text color on hover/focus */
-    border-radius: 4px; /* Add border-radius */
+    color: #18BC9C;
+    border-radius: 4px;
+  }
+  
+  .nav-item-logout:focus {
+    outline: none;
   }
 
 .nav-toggle {
