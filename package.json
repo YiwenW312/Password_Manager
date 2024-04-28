@@ -11,5 +11,8 @@
     "jwt-decode": "^4.0.0",
     "react-scripts": "^5.0.1",
     "serve": "^11.3.2"
-  }
+  },
+  "engines": {
+    "node": "20.11.0"
+}
 }
