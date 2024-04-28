@@ -13,14 +13,11 @@ function Navbar() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
 
-  const handleLogout = () => {
-    logout().then(() => {
-        navigate('/');
-        setIsMenuOpen(false);
-    }).catch(error => {
-        console.error("Logout Error:", error);
-    });
-};
+  const handleLogout = async (event) => {
+    event.preventDefault(); 
+    await logout();
+    navigate('/'); 
+  };
 
   return (
     <nav className='navbar'>
@@ -40,9 +37,9 @@ function Navbar() {
             >
               {`${currentUser.username}'s Password Manager`}
             </Link>
-            <Link className='nav-item-logout' onClick={() => handleLogout}>
+            <Button className='button-as-link' onClick={handleLogout}>
               Logout
-            </Link>
+            </Button>
           </>
         ) : (
           <>
