@@ -32,10 +32,7 @@ function Navbar () {
         &#9776;
       </button>
       <div className={`nav-menu ${isMenuOpen ? 'open' : ''}`}>
-        <Link to='/' className='nav-item' onClick={() => setIsMenuOpen(false)}>
-          Home
-        </Link>
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <div className='nav-item-container'>
             <Link
               to='/password-manager'
@@ -44,11 +41,19 @@ function Navbar () {
             >
               {`${currentUser.username}'s Password Manager`}
             </Link>
+            <Link
+              to='/'
+              className='nav-item'
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
             <button className='nav-item-logout' onClick={handleLogout}>
               Logout
             </button>
           </div>
-        ) : (
+        )}
+        {!isAuthenticated && (
           <>
             <Link className='nav-item' onClick={() => setShowLoginModal(true)}>
               Login
