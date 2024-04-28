@@ -34,7 +34,6 @@ export function AuthProvider ({ children }) {
       const data = response.data
 
       localStorage.setItem('token', data.token)
-
       setCurrentUser({ username, token: data.token, userId: data.user.id })
       setIsAuthenticated(true)
       setError(null)
@@ -43,7 +42,6 @@ export function AuthProvider ({ children }) {
       console.error('Login failed:', error)
       if (error.response) {
         const data = error.response.data
-
         // Check if the data is a string starting with '<!DOCTYPE', means that the database is no ready
         if (typeof data === 'string' && data.startsWith('<!DOCTYPE')) {
           setError('Database is not ready, try again later.')
@@ -59,13 +57,9 @@ export function AuthProvider ({ children }) {
           )
         }
       } else if (error.request) {
-        // The request was made but no response was received
         setError('No response received from server. Please try again.')
-        alert('No response received from server. Please try again.')
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError(error.message)
-        alert(error.message)
       }
       setIsAuthenticated(false)
     }

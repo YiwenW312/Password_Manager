@@ -5,6 +5,8 @@ import CopyToClipboardButton from './CopyToClipboardButton'
 import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
 import axios from 'axios'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
@@ -31,6 +33,7 @@ function PasswordManagerPage () {
   const [showShareModal, setShowShareModal] = useState(false)
   // share requests
   const [pendingShareRequests, setPendingShareRequests] = useState([])
+  const [passwordVisible, setPasswordVisible] = useState(false)
 
   // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
@@ -85,7 +88,6 @@ function PasswordManagerPage () {
     e.preventDefault()
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     const endpoint = `${API_BASE_URL}/api/passwords/newPasswords`
-
     const bodyContent = {
       url: newUrl,
       password: newPassword,
@@ -93,7 +95,6 @@ function PasswordManagerPage () {
       useSymbols,
       length: passwordLength
     }
-
     try {
       const response = await axios.post(endpoint, bodyContent, {
         headers: {
@@ -101,21 +102,20 @@ function PasswordManagerPage () {
         }
       })
       const data = response.data
-      if (response.status !== 200) {
+      if (response.status === 201) {
+        // Password successfully created
+        setNewUrl('')
+        setNewPassword('')
+        setPasswordLength(12)
+        setUseNumbers(true)
+        setUseSymbols(false)
+        fetchPasswords()
+        alert('Password successfully created')
+      } else {
         throw new Error(
           data.message || 'Error occurred while saving the password'
         )
       }
-
-      setNewUrl('')
-      setNewPassword('')
-      setPasswordLength(12)
-      setUseNumbers(true)
-      setUseSymbols(false)
-      fetchPasswords()
-
-      // Optionally navigate or show a success message
-      alert('Password successfully created')
     } catch (error) {
       console.error('Error:', error)
       alert(error.response?.data?.message || error.message)
@@ -303,12 +303,21 @@ function PasswordManagerPage () {
           onChange={e => setNewUrl(e.target.value)}
           required
         />
-        <input
-          type='text'
-          placeholder='Password (leave empty to generate)'
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-        />
+        <div className='input-group'>
+          <input
+            type={passwordVisible ? 'text' : 'password'}
+            placeholder='Password (leave empty to generate)'
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+          />
+          <button
+            type='button'
+            onClick={() => setPasswordVisible(!passwordVisible)}
+            className='password-toggle'
+          >
+            <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye} />
+          </button>
+        </div>
         <div>
           <label>
             <input
@@ -356,16 +365,22 @@ function PasswordManagerPage () {
         {filteredPasswords.map(passwordEntry => (
           <li key={passwordEntry._id}>
             <div className='password-info'>
-              <p><strong>URL:</strong> {passwordEntry.url}
-
-              <strong>Password:</strong>{' '}
-              {showPasswordIds.has(passwordEntry._id)
-                ? passwordEntry.password
-                : '••••••'}</p>
-              <p><strong>Last Updated:</strong>{' '}
-              {new Date(passwordEntry.updatedAt).toLocaleString()}</p>
+              <p>
+                <strong>URL:</strong> {passwordEntry.url}
+                <strong>Password:</strong>{' '}
+                {showPasswordIds.has(passwordEntry._id)
+                  ? passwordEntry.password
+                  : '••••••'}
+              </p>
+              <p>
+                <strong>Last Updated:</strong>{' '}
+                {new Date(passwordEntry.updatedAt).toLocaleString()}
+              </p>
               {passwordEntry.type === 'shared' && (
-                <p><strong>Password owner:</strong> {passwordEntry.userId.username}</p>
+                <p>
+                  <strong>Password owner:</strong>{' '}
+                  {passwordEntry.userId.username}
+                </p>
               )}
             </div>
             <div className='password-actions'>
