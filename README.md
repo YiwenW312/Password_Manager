@@ -18,7 +18,7 @@
 5. add Cryptographically Secure Passwords
 
 # Instructions
-- To Run this App at local host 3000:
+- To Run this App at local host 8000:
 1. direct to Frontend: 
     - `cd password`
     - `cd frontend`
