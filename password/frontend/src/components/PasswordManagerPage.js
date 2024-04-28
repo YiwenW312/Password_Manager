@@ -6,7 +6,6 @@ import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
 import axios from 'axios'
 
-
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
   const { currentUser } = useAuth()
@@ -139,7 +138,7 @@ function PasswordManagerPage () {
       const data = response.data
 
       if (response.status !== 200) {
-        throw new Error(data.message || 'Error occurred during delete');
+        throw new Error(data.message || 'Error occurred during delete')
       }
 
       alert('Password deleted successfully')
@@ -179,7 +178,7 @@ function PasswordManagerPage () {
       const data = response.data
 
       if (response.status !== 200) {
-        throw new Error(data.message || 'Error occurred during edit');
+        throw new Error(data.message || 'Error occurred during edit')
       }
 
       // Update the state with the new password list
@@ -369,7 +368,7 @@ function PasswordManagerPage () {
               )}
             </div>
             <div className='password-actions'>
-              {passwordEntry.type === 'own' ? (
+              {passwordEntry.type === 'own' && (
                 <>
                   <button
                     onClick={() => togglePasswordVisibility(passwordEntry._id)}
@@ -384,8 +383,16 @@ function PasswordManagerPage () {
                     Delete
                   </button>
                 </>
-              ) : (
-                <p>Shared by: {passwordEntry.userId.username}</p>
+              )}
+              {passwordEntry.type !== 'own' && (
+                <>
+                  <button
+                    onClick={() => togglePasswordVisibility(passwordEntry._id)}
+                  >
+                    {showPasswordIds.has(passwordEntry._id) ? 'Hide' : 'Show'}
+                  </button>
+                  <CopyToClipboardButton text={passwordEntry.password} />
+                </>
               )}
             </div>
           </li>
@@ -414,7 +421,8 @@ function PasswordManagerPage () {
           pendingShareRequests.map(request => (
             <li key={request.id}>
               <p>
-                {request.fromUser.username} want to share passwords with you!
+                <strong>{request.fromUser.username}</strong> want to share
+                passwords with you!
               </p>
               <button onClick={() => handleAcceptShareRequest(request.id)}>
                 Accept
