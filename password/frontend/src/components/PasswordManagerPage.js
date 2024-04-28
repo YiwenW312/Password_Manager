@@ -355,11 +355,6 @@ function PasswordManagerPage () {
         <button type='submit'>Add Password</button>
       </form>
 
-      {/*share button*/}
-      <button onClick={() => setShowShareModal(true)}>
-        Share Password to Others
-      </button>
-
       {/*password list*/}
       <ul className='password-list'>
         {filteredPasswords.map(passwordEntry => (
@@ -429,6 +424,12 @@ function PasswordManagerPage () {
           currentUser={currentUser}
         />
       )}
+
+      {/*share button*/}
+      <button onClick={() => setShowShareModal(true)}>
+        Share Password to Others
+      </button>
+
       {/*pending request*/}
       <div className='share-request'>
         <h3>Pending Share Requests:</h3>
