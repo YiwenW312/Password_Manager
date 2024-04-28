@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios';
-
+import axios from 'axios'
 
 const AuthContext = createContext(null)
 
@@ -24,47 +23,53 @@ export function AuthProvider ({ children }) {
   }, [])
 
   const login = async (username, password) => {
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/login`, {
         username,
         password
-      });
-  
+      })
 
-      const data = response.data;
+      const data = response.data
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.token)
 
-      
-      setCurrentUser({ username, token: data.token, userId: data.user.id});
-      setIsAuthenticated(true);
-      setError(null);
-      navigate('/password-manager');
+      setCurrentUser({ username, token: data.token, userId: data.user.id })
+      setIsAuthenticated(true)
+      setError(null)
+      navigate('/password-manager')
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login failed:', error)
       if (error.response) {
-        const data = error.response.data;
+        const data = error.response.data
 
         // Check if the data is a string starting with '<!DOCTYPE', means that the database is no ready
         if (typeof data === 'string' && data.startsWith('<!DOCTYPE')) {
-          setError('Database is not ready, try again later.');
+          setError('Database is not ready, try again later.')
           alert('Database is not ready, try again later.')
         } else {
-          setError(error.response.data.message || 'An error occurred during the login attempt.');
+          setError(
+            error.response.data.message ||
+              'An error occurred during the login attempt.'
+          )
+          alert(
+            error.response.data.message ||
+              'An error occurred during the login attempt.'
+          )
         }
       } else if (error.request) {
         // The request was made but no response was received
-        setError('No response received from server. Please try again.');
+        setError('No response received from server. Please try again.')
+        alert('No response received from server. Please try again.')
       } else {
         // Something happened in setting up the request that triggered an Error
-        setError(error.message);
+        setError(error.message)
+        alert(error.message)
       }
-
-      setIsAuthenticated(false);
+      setIsAuthenticated(false)
     }
-}
+  }
 
   const logout = () => {
     localStorage.removeItem('token')
