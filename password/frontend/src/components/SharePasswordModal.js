@@ -1,46 +1,47 @@
 import React, { useState } from 'react';
 import '../styles/SharePasswordModal.css';
+import axios from 'axios'
+
 
 const SharePasswordModal = ({ close, currentUser }) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleShare = async e => {
+  const handleShare = async (e) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       setError('No authentication token found. Please login again.');
       setIsSubmitting(false);
       return;
     }
-
+  
     try {
-      const response = await fetch('/api/share-requests/', {
-        method: 'POST',
+      const response = await axios.post('/api/share-requests/', {
+        fromUserId: currentUser.userId,
+        toUsername: username,
+      }, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          fromUserId: currentUser.userId,
-          toUsername: username,
-        })
+        }
       });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Unable to send share request.');
+  
+      const data = response.data;
+      if (response.status !== 200) {
+        throw new Error(
+          data.message || 'Error occurred while saving the password'
+        )
       }
-
       alert('Share request sent successfully.');
       handleModalClose();
     } catch (error) {
       console.error('Send failed:', error);
-      setError(error.message);
+      setError(error.response?.data?.message || error.message || 'Unable to send share request.');
       setIsSubmitting(false);
     }
   };

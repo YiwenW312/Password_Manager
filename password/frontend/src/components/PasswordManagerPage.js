@@ -4,6 +4,8 @@ import '../styles/PasswordManagerPage.css'
 import CopyToClipboardButton from './CopyToClipboardButton'
 import SharePasswordModal from './SharePasswordModal'
 import EditPasswordModal from './EditPasswordModal'
+import axios from 'axios'
+
 
 function PasswordManagerPage () {
   // Retrieve the current user and authentication status from the AuthContext
@@ -31,34 +33,28 @@ function PasswordManagerPage () {
   // share requests
   const [pendingShareRequests, setPendingShareRequests] = useState([])
 
-  /**
-   * All Fetch functions are defined here
-   * fetchPasswords: Fetches the passwords from the server
-   * fetchSharedPasswords: Fetches the shared passwords from the server
-   * userEffect: Fetches the passwords and shared passwords when the component mounts
-   * userEffect: Filters the passwords based on the search term
-   * handleSearchChange: Handles the change in the search term
-   */
   // Function to fetch or filter the passwords from the server
   const fetchPasswords = useCallback(async () => {
     const token = localStorage.getItem('token')
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     try {
-      const endpoint = `http://localhost:8000/api/passwords/user/${currentUser.userId}`
-      console.log('userId4:', currentUser.userId)
-      const response = await fetch(endpoint, {
-        method: 'GET',
+      const endpoint = `${API_BASE_URL}/api/passwords/user/${currentUser.userId}`
+      const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      console.log('response:', response)
-      if (!response.ok)
+
+      if (response.status !== 200)
         throw new Error(`HTTP error! Status: ${response.status}`)
-      const data = await response.json()
+
+      const data = response.data
       setPasswords(data)
       setFilteredPasswords(data)
-      console.log('data:', data)
+      if (data.length === 0) {
+        alert('No passwords found for this user.')
+      }
     } catch (error) {
-      console.error('Error fetching passwords:', error)
-      alert(error.message)
+      const errorMessage = error.response?.data?.message || error.message
+      console.error('Error fetching passwords:', errorMessage)
     }
   }, [currentUser])
 
@@ -83,24 +79,14 @@ function PasswordManagerPage () {
   // Function to handle the change in the search term
   const handleSearchChange = e => {
     setSearchTerm(e.target.value)
-    console.log('userId-1:', currentUser.userId)
   }
 
-  /**
-   * All functions to handle password creation, deletion, editing, and sharing
-   * handlePasswordCreation: Generates a secure password or uses the provided password
-   * handleDelete: Deletes a password
-   * handleEdit: Handles the editing of a password
-   * handleSaveChanges: Handles saving the changes to a password
-   * submitEdit: Submits the edited password
-   *
-   */
   // Function to generate a secure password or use the provided password
   const handlePasswordCreation = async e => {
     e.preventDefault()
-    const method = 'POST'
-    const endpoint = 'http://localhost:8000/api/passwords/newPasswords'
-    console.log('userId-2:', currentUser.userId)
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+    const endpoint = `${API_BASE_URL}/api/passwords/newPasswords`
+
     const bodyContent = {
       url: newUrl,
       password: newPassword,
@@ -110,57 +96,56 @@ function PasswordManagerPage () {
     }
 
     try {
-      const response = await fetch(endpoint, {
-        method,
+      const response = await axios.post(endpoint, bodyContent, {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(bodyContent)
+        }
       })
-      console.log('userId-3:', currentUser.userId)
-      const data = await response.json()
-      if (!response.ok) {
+      const data = response.data
+      if (response.status !== 200) {
         throw new Error(
           data.message || 'Error occurred while saving the password'
         )
       }
 
-      // Resetting fields on successful creation or navigate to a different page or update the state
       setNewUrl('')
       setNewPassword('')
       setPasswordLength(12)
       setUseNumbers(true)
       setUseSymbols(false)
       fetchPasswords()
+
+      // Optionally navigate or show a success message
+      alert('Password successfully created')
     } catch (error) {
       console.error('Error:', error)
-      alert(error.message)
+      alert(error.response?.data?.message || error.message)
     }
   }
 
   // Function to handle the deletion of a password
   const handleDelete = async id => {
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/passwords/${id}`,
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/passwords/${id}`,
         {
-          method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         }
       )
-      console.log('userId-?:', currentUser.userId)
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to delete the password')
+
+      const data = response.data
+
+      if (response.status !== 200) {
+        throw new Error(data.message || 'Error occurred during delete');
       }
+
       alert('Password deleted successfully')
       fetchPasswords()
     } catch (error) {
-      console.error('Error:', error)
-      alert(error.message)
+      alert(error.response?.data?.message || error.message)
     }
   }
 
@@ -178,22 +163,23 @@ function PasswordManagerPage () {
 
   // Function to submit the edited password
   const submitEdit = async ({ _id, url, password }) => {
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     const token = localStorage.getItem('token')
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/passwords/${_id}`,
+      const response = await axios.put(
+        `${API_BASE_URL}/api/passwords/${_id}`,
+        { url, password },
         {
-          method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ url, password })
+          }
         }
       )
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to update password')
+
+      const data = response.data
+
+      if (response.status !== 200) {
+        throw new Error(data.message || 'Error occurred during edit');
       }
 
       // Update the state with the new password list
@@ -208,7 +194,7 @@ function PasswordManagerPage () {
       alert('Update successfully')
     } catch (error) {
       console.error('Error:', error)
-      alert(error.message)
+      alert(error.response?.data?.message || error.message)
     }
   }
 
@@ -228,14 +214,15 @@ function PasswordManagerPage () {
   // Function to fetch pending request
   const fetchPendingShareRequests = useCallback(async () => {
     const token = localStorage.getItem('token')
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/share-requests/${currentUser.userId}/pending`,
+      const response = await axios.get(
+        `${API_BASE_URL}/api/share-requests/${currentUser.userId}/pending`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       )
-      const data = await response.json()
+      const data = response.data
       if (Array.isArray(data)) {
         setPendingShareRequests(data)
       } else {
@@ -254,17 +241,15 @@ function PasswordManagerPage () {
 
   const handleAcceptShareRequest = async id => {
     const token = localStorage.getItem('token')
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/share-requests/${id}/accept`,
+      await axios.post(
+        `${API_BASE_URL}/api/share-requests/${id}/accept`,
+        {},
         {
-          method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         }
       )
-      if (!response.ok) {
-        throw new Error('Failed to accept share request')
-      }
       fetchPendingShareRequests()
       fetchPasswords()
     } catch (error) {
@@ -274,17 +259,15 @@ function PasswordManagerPage () {
 
   const handleRejectShareRequest = async id => {
     const token = localStorage.getItem('token')
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/share-requests/${id}/reject`,
+      await axios.post(
+        `${API_BASE_URL}/api/share-requests/${id}/reject`,
+        {},
         {
-          method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         }
       )
-      if (!response.ok) {
-        throw new Error('Failed to reject share request')
-      }
       fetchPendingShareRequests()
     } catch (error) {
       console.error('Error rejecting share request:', error)
@@ -312,8 +295,8 @@ function PasswordManagerPage () {
       >
         Search
       </button>
-{/* Add password */}
-<form onSubmit={handlePasswordCreation}>
+      {/* Add password */}
+      <form onSubmit={handlePasswordCreation}>
         <input
           type='text'
           placeholder='URL'

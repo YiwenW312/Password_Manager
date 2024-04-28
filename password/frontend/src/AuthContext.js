@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios';
+
 
 const AuthContext = createContext(null)
 
@@ -22,52 +24,58 @@ export function AuthProvider ({ children }) {
   }, [])
 
   const login = async (username, password) => {
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    
     try {
-      const response = await fetch('http://localhost:8000/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      })
+      const response = await axios.post(`${API_BASE_URL}/api/users/login`, {
+        username,
+        password
+      });
+  
 
-      const data = await response.json()
-      console.log('data:', data)
-      if (!response.ok) {
-        throw new Error(data.message || 'Error occurred during login')
-      }
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('userId', data.user.id)
-      console.log('userId1:', data.user.id)
+      const data = response.data;
+
+      localStorage.setItem('token', data.token);
+
       
-      setCurrentUser({ username, token: data.token, userId: data.user.id})
-      console.log('current user:', currentUser)
-      console.log('userId2:', data.user.id)
-      setIsAuthenticated(true)
-      setError(null)
-      navigate('/password-manager')
-      setCurrentUser({ username, token: data.token, userId: data.user.id})
-      console.log('userId3:', data.user.id)
-      setIsAuthenticated(true)
-      setError(null)
+      setCurrentUser({ username, token: data.token, userId: data.user.id});
+      setIsAuthenticated(true);
+      setError(null);
+      navigate('/password-manager');
     } catch (error) {
-      console.error('Login failed:', error)
-      setError(error.message)
-      setIsAuthenticated(false)
-      throw error
-    }
-  }
+      console.error('Login failed:', error);
+      if (error.response) {
+        const data = error.response.data;
 
-  const logout = () => {
-    console.log('logging out')
-    console.log('current user1:', currentUser)
-    localStorage.removeItem('token')
-    console.log('current user2', currentUser)
-    setCurrentUser(null)
-    console.log('current user3:', currentUser)
-    setIsAuthenticated(false)
-    console.log('current user4:', currentUser)
+        // Check if the data is a string starting with '<!DOCTYPE', means that the database is no ready
+        if (typeof data === 'string' && data.startsWith('<!DOCTYPE')) {
+          setError('Database is not ready, try again later.');
+          alert('Database is not ready, try again later.')
+        } else {
+          setError(error.response.data.message || 'An error occurred during the login attempt.');
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError('No response received from server. Please try again.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError(error.message);
+      }
+
+      setIsAuthenticated(false);
+    }
+}
+
+const logout = () => {
+  try {
+      localStorage.removeItem('token');
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+  } catch (error) {
+      console.error('Failed to logout:', error);
   }
+};
+
 
   return (
     <AuthContext.Provider

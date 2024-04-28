@@ -7,7 +7,7 @@ function Footer () {
       This site is developed by Yiwen Wang & Wen Xie as the final project for
       course CS5610.
       <a
-        href='https://github.com/YiwenW312/passwordManager'
+        href='https://github.com/YiwenW312/Yiwen-Wang-Wen-Xie-Project3'
         target='_blank'
         rel='noopener noreferrer'
       >

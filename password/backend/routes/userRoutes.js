@@ -1,10 +1,11 @@
 // This is the userRoutes.js file that contains the routes for the user authentication operations
-
+require('dotenv').config();
 // Require necessary NPM packages
 const express = require('express')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+
 // Instantiate a Router
 const router = express.Router()
 

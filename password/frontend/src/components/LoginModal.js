@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import '../styles/LoginModal.css'
 
+
 const LoginModal = ({ close }) => {
   const { login, error } = useAuth()
   const [username, setUsername] = useState('')

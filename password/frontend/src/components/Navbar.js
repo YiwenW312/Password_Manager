@@ -11,20 +11,16 @@ function Navbar() {
   const { currentUser, isAuthenticated, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [readyToLogout, setReadyToLogout] = useState(false);
+
 
   const handleLogout = () => {
-    navigate('/');
-    setIsMenuOpen(false);
-    setReadyToLogout(true);
-  };
-
-  useEffect(() => {
-    if (readyToLogout) {
-      logout();
-      setReadyToLogout(false); 
-    }
-  }, [readyToLogout, logout]);
+    logout().then(() => {
+        navigate('/');
+        setIsMenuOpen(false);
+    }).catch(error => {
+        console.error("Logout Error:", error);
+    });
+};
 
   return (
     <nav className='navbar'>
@@ -44,9 +40,9 @@ function Navbar() {
             >
               {`${currentUser.username}'s Password Manager`}
             </Link>
-            <button className='nav-item-logout' onClick={handleLogout}>
+            <Link className='nav-item-logout' onClick={() => handleLogout}>
               Logout
-            </button>
+            </Link>
           </>
         ) : (
           <>

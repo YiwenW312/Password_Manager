@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import '../styles/EditPasswordModal.css'
 
+
 function EditPasswordModal ({ onClose, onSave, currentPassword }) {
   const [url, setUrl] = useState(currentPassword.url)
   const [password, setPassword] = useState(currentPassword.password)

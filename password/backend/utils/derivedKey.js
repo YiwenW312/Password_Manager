@@ -9,6 +9,5 @@ const passphrase = process.env.SECRET
 const salt = crypto.randomBytes(16)
 
 const key = deriveKey(passphrase, salt)
-console.log('Derived 32-byte key:', key.toString('hex'))
 
 module.exports = { key, salt }

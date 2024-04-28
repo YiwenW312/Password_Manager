@@ -9,7 +9,7 @@ import PasswordManagerPage from './components/PasswordManagerPage'
 import { AuthProvider } from './AuthContext'
 
 function App () {
-  localStorage.clear()
+  localStorage.clear();
   return (
     <Router>
       <AuthProvider>
