@@ -104,7 +104,6 @@ function PasswordManagerPage () {
       })
       const data = response.data
       if (response.status === 201) {
-        
         // Password successfully created
         setNewUrl('')
         setNewPassword('')
@@ -286,7 +285,7 @@ function PasswordManagerPage () {
         value={searchTerm}
         onChange={handleSearchChange}
       />
-      <button
+      {/* <button
         onClick={() =>
           setFilteredPasswords(
             passwords.filter(p =>
@@ -296,8 +295,10 @@ function PasswordManagerPage () {
         }
       >
         Search
-      </button>
+      </button> */}
+
       {/* Add password */}
+      <h3>Add Password</h3>
       <form onSubmit={handlePasswordCreation}>
         <input
           type='text'
@@ -359,6 +360,7 @@ function PasswordManagerPage () {
       </form>
 
       {/*password list*/}
+      <h3>Your Passwords List</h3>
       <ul className='password-list'>
         {filteredPasswords.map(passwordEntry => (
           <li key={passwordEntry._id}>
@@ -437,12 +439,13 @@ function PasswordManagerPage () {
       <div className='share-request'>
         <h3>Pending Share Requests:</h3>
         <p>If you accept the request, you will see each other's passwords.</p>
-        <ul>
-          {Array.isArray(pendingShareRequests) &&
-            pendingShareRequests.map(request => (
+        {Array.isArray(pendingShareRequests) &&
+        pendingShareRequests.length > 0 ? (
+          <ul>
+            {pendingShareRequests.map(request => (
               <li key={request.id}>
                 <p>
-                  <strong>{request.fromUser.username}</strong> want to share
+                  <strong>{request.fromUser.username}</strong> wants to share
                   passwords with you!
                 </p>
                 <div className='button-container'>
@@ -455,7 +458,10 @@ function PasswordManagerPage () {
                 </div>
               </li>
             ))}
-        </ul>
+          </ul>
+        ) : (
+          <p>No pending requests found.</p>
+        )}
       </div>
     </div>
   )
