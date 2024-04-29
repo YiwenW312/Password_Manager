@@ -2,21 +2,11 @@
   "name": "fullstack-application",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
-  "workspaces": [
-    "backend",
-    "frontend"
-  ],
   "scripts": {
-    "start": "npm run start --workspace=backend",
-    "deploy": "npm run build --workspace=frontend && npm run start --workspace=backend",
-    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
-    "prod": "npm run start --workspace=backend",
-    "build": "npm run build --workspace=frontend",
-    "setup-and-dev": "npm install && npm run build --workspace=frontend && npm run dev"
-  },
-  "devDependencies": {
-    "concurrently": "^8.0.1"
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "heroku-postbuild": "npm run build"
   },
   "engines": {
     "node": "20.11.0"
