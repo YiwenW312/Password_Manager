@@ -19,7 +19,8 @@
 5. copy to clipboard
 6. Search/filter passwords
 7. Visually Obscured Password
-5. Cryptographically secure passwords
+8. Cryptographically secure passwords
+9. Mobile Responsive adjustments
 
 
 # Instructions
