@@ -15,9 +15,6 @@
     "build": "npm run build --workspace=frontend",
     "setup-and-dev": "npm install && npm run build --workspace=frontend && npm run dev"
   },
-  "dependencies": {
-    "concurrently": "^8.0.1"
-  },
   "devDependencies": {
     "concurrently": "^8.0.1"
   },
