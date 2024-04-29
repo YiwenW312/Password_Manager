@@ -27,12 +27,10 @@
 # Instructions
 - To Run this App at local host 8000:
 1. direct to Frontend: 
-    - `cd password`
     - `cd frontend`
     - `npm install`
     - `npm start`
 2. new terminal, direct to Backend:
-    - `cd password`
     - `cd backend`
     - `npm install`
     - `npm start`
