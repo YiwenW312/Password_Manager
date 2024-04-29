@@ -15,12 +15,13 @@
 1. User authentication - Use local storage to save "token"
 2. Encrypted sensitive data
 3. Register & login
-4. share passwords to other user by sending share-requests
+4. share passwords to other user by sending share-requests; if accept, users could see each other's all passwords
 5. copy to clipboard
-6. Search/filter passwords
-7. Visually Obscured Password
-8. Cryptographically secure passwords
-9. Mobile Responsive adjustments
+6. edit password
+7. Search/filter passwords
+8. Visually Obscured Password
+9. Cryptographically secure passwords
+10. Mobile Responsive adjustments
 
 
 # Instructions
@@ -37,6 +38,17 @@
     - `npm start`
 - Public URL: https://yiwen-password-manager-09cea1536aab.herokuapp.com/
 
+
+# Screenshorts
+![homepage](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/1.png)
+![login](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/2.png)
+![Visually Obscured Password](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/3.png)
+![Password Manager Page](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/4.png)
+![Password Manage Page - 2](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/5.png)
+![show hide passwords](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/6.png)
+![edit passwords](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/7.png)
+![search or filter passwords](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/8.png)
+![send share request](https://github.com/YiwenW312/Password_Manager/blob/main/screenshots/9.png)
 
 # Introduction
 This is the final project for CS5610 at Northeasern University Seattle Campus, Spring 2024. We have two team members: Yiwen Wang and Wen Xie. 
