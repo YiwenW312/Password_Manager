@@ -27,11 +27,11 @@ app.use('/api/share-requests', authenticateToken, shareRequestRoutes);
 
 
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, '.', 'frontend','build')));
+app.use(express.static(path.join(__dirname, '..', 'frontend','build')));
 
 // Handles any requests that don't match the ones above
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '.', 'frontend', 'build','public', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'build','public', 'index.html'));
 });
 
 app.get('favicon.ico', (req, res) => res.status(204));
