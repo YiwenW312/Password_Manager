@@ -38,6 +38,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '.', 'frontend', 'build','public', 'index.html'));
 });
 
+app.get('/favicon.ico', (req, res) => res.status(204));
+
 // Handle 404 - Resource not found
 app.use((req, res, next) => {
   res.status(404).send({ message: 'Route not found' });
