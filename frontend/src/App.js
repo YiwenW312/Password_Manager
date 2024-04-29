@@ -15,7 +15,7 @@ function App () {
       <AuthProvider>
         <Navbar />
         <Routes>
-          <Route exact path='/' element={<HomePage />} />
+          <Route exact path='/homepage' element={<HomePage />} />
           <Route path='/login' element={<LoginModal />} />
           <Route path='/register' element={<RegisterModal />} />
           <Route path='/password-manager' element={<PasswordManagerPage />} />

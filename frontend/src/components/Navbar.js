@@ -14,7 +14,7 @@ function Navbar () {
   const [readyToLogout, setReadyToLogout] = useState(false)
 
   const handleLogout = () => {
-    navigate('/')
+    navigate('/homepage')
     setIsMenuOpen(false)
     setReadyToLogout(true)
   }
@@ -35,7 +35,7 @@ function Navbar () {
         {isAuthenticated && (
           <div className='nav-item-container'>
             <Link
-              to='/'
+              to='/homepage'
               className='nav-item'
               onClick={() => setIsMenuOpen(false)}
             >
@@ -57,7 +57,7 @@ function Navbar () {
         {!isAuthenticated && (
           <>
             <Link
-              to='/'
+              to='/homepage'
               className='nav-item'
               onClick={() => setIsMenuOpen(false)}
             >
