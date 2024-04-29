@@ -9,13 +9,18 @@
 |Date|Version|Description|Author|
 |:----:|:----:|:----:|:----:|
 |Apr 18, 2024|1.0|Initial Readme| Yiwen Wang|
+|Apr 28, 2024|1.0|update Readme with deployment on Heroku| Yiwen Wang|
 
-# Extra points
-1. add password encryption
-2. add easy Copy to Clipboard
-3. add visually Obscured Passwords
-4. add Password Search
-5. add Cryptographically Secure Passwords
+# Features:
+1. User authentication - Use local storage to save "token"
+2. Encrypted sensitive data
+3. Register & login
+4. share passwords to other user by sending share-requests
+5. copy to clipboard
+6. Search/filter passwords
+7. Visually Obscured Password
+5. Cryptographically secure passwords
+
 
 # Instructions
 - To Run this App at local host 8000:
@@ -29,7 +34,7 @@
     - `cd backend`
     - `npm install`
     - `npm start`
-- Public URL: https://yiwen-wang-wen-xie-project3.onrender.com/
+- Public URL: https://yiwen-password-manager-09cea1536aab.herokuapp.com/
 
 
 # Introduction
