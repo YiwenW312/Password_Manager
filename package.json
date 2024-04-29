@@ -2,12 +2,13 @@
   "name": "fullstack-application",
   "version": "1.0.0",
   "private": true,
+  "main": "index.js",
   "workspaces": [
     "backend",
     "frontend"
   ],
   "scripts": {
-    "start": "concurrently \"npm run start --workspace=backend\" \"npm run start --workspace=frontend\"",
+    "start": "npm run start --workspace=backend",
     "deploy": "npm run build --workspace=frontend && npm run start --workspace=backend",
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "prod": "npm run start --workspace=backend",
@@ -15,9 +16,9 @@
     "setup-and-dev": "npm install && npm run build --workspace=frontend && npm run dev"
   },
   "dependencies": {
-    "concurrently": "^5.3.0"
+    "concurrently": "^8.0.1"
   },
   "devDependencies": {
-    "concurrently": "^5.3.0"
+    "concurrently": "^8.0.1"
   }
 }
