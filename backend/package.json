@@ -1,15 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend server for the fullstack application",
   "main": "server.js",
   "scripts": {
-    "devstart": "concurrently \"nodemon ./server.js\" \"react-scripts start\"",
     "start": "node server.js",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "proxy": "http://localhost:8000"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +18,9 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
-    "mongoose-encryption": "^2.1.2",
-    "react-scripts": "^5.0.1"
+    "mongoose-encryption": "^2.1.2"
   },
   "engines": {
     "node": "20.11.0"
-}
+  }
 }

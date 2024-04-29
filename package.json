@@ -1,18 +1,20 @@
 {
+  "name": "fullstack-application",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "devstart": "concurrently \"nodemon ./server.js\" \"react-scripts start\"",
-    "start": "node ./backend/index.js",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "concurrently \"npm run start --workspace=backend\" \"npm run start --workspace=frontend\"",
+    "deploy": "npm run build --workspace=frontend && npm run start --workspace=backend",
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "prod": "npm run start --workspace=backend",
+    "build": "npm run build --workspace=frontend",
+    "setup-and-dev": "npm install && npm run build --workspace=frontend && npm run dev"
   },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "jwt-decode": "^4.0.0",
-    "react-scripts": "^5.0.1",
-    "serve": "^11.3.2"
-  },
-  "engines": {
-    "node": "20.11.0"
+  "devDependencies": {
+    "concurrently": "^5.3.0"
   }
 }
