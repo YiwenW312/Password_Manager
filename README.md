@@ -1,4 +1,4 @@
-# Password Manager - CS5610 Final Project
+# Password Manager - Full-Stack Web Application
 - **Title:** Readme file
 - **Date:** Apr 18, 2024
 - **Author:** Yiwen Wang
@@ -10,6 +10,20 @@
 |:----:|:----:|:----:|:----:|
 |Apr 18, 2024|1.0|Initial Readme| Yiwen Wang|
 |Apr 28, 2024|1.0|update Readme with deployment on Heroku| Yiwen Wang|
+|July7, 2024|1.0|update Readme | Yiwen Wang|
+
+# Project Overview
+- Developed a secure password management web application using JavaScript for full-stack development. Built the backend with Express and Node.js, and the frontend with React, deploying on Heroku.
+
+- Role: Developer
+
+- Technologies Used: JavaScript, React, Express, Node.js, Heroku, MongoDB, Security, User Authentication, CSS, HTML, Git
+
+# Key Contributions and Achievements
+- Implemented features like secure password generation, user authentication, user authorization, and encrypted sensitive data.
+- Ensuring security and user-friendliness in password management.
+- Successfully developed a secure and user-friendly password management application.
+
 
 # Features:
 1. User authentication - Use local storage to save "token"
